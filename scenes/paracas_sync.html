@@ -1,0 +1,50 @@
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Cultura Paracas (con subtítulos)</title>
+    <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+    <link rel="stylesheet" href="../style.css">
+  </head>
+  <body>
+    <a-scene>
+      <a-assets>
+        <a-asset-item id="modeloParacas" src="../assets/models/paracas.glb"></a-asset-item>
+        <audio id="audioParacas" src="../assets/audio/paracas.mp3" preload="auto"></audio>
+      </a-assets>
+
+      <a-entity gltf-model="#modeloParacas" position="0 0 -3" scale="2 2 2"></a-entity>
+      <a-text value="Cultura Paracas: Arte textil y medicina ancestral" position="0 2.5 -3" align="center" width="6" color="#FFFFFF"></a-text>
+      <a-text id="subtitulo" value="" position="0 2 -3" align="center" width="5" color="yellow"></a-text>
+      <a-entity id="narracion" sound="src: #audioParacas; autoplay: true"></a-entity>
+
+      <a-box position="0 0.3 -2" width="1.5" height="0.5" depth="0.1" color="#4CAF50"
+             event-set__enter="_event: mouseenter; color: #81C784"
+             event-set__leave="_event: mouseleave; color: #4CAF50"
+             onclick="window.location.href='../index.html'">
+      </a-box>
+      <a-text value="Volver al Mapa" position="0 0.5 -2.01" align="center" width="3"></a-text>
+
+      <script>
+        const subtitulos = [{'tiempo': 0, 'texto': 'Bienvenidos a la Cultura Paracas.'}, {'tiempo': 4, 'texto': 'Famosa por su arte textil y prácticas funerarias.'}, {'tiempo': 8, 'texto': 'Conocida también por las trepanaciones craneanas.'}, {'tiempo': 12, 'texto': 'Descubierta por Julio C. Tello en 1925.'}, {'tiempo': 16, 'texto': 'Gracias por conocer la Cultura Paracas.'}];
+
+        const audio = document.querySelector("#narracion").components.sound.pool.children[0];
+        const subtitulo = document.querySelector("#subtitulo");
+
+        function mostrarSubtitulo() {
+          const tiempo = audio.currentTime;
+          for (let i = subtitulos.length - 1; i >= 0; i--) {
+            if (tiempo >= subtitulos[i].tiempo) {
+              subtitulo.setAttribute("value", subtitulos[i].texto);
+              break;
+            }
+          }
+        }
+
+        audio.addEventListener("timeupdate", mostrarSubtitulo);
+        setInterval(mostrarSubtitulo, 500);
+      </script>
+    </a-scene>
+  </body>
+</html>

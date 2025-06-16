@@ -1,0 +1,30 @@
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Cultura Caral</title>
+    <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+    <link rel="stylesheet" href="../style.css">
+  </head>
+  <body>
+    <a-scene>
+      <a-assets>
+        <a-asset-item id="modeloCaral" src="../assets/models/caral.glb"></a-asset-item>
+        <audio id="audioCaral" src="../assets/audio/caral.mp3" preload="auto"></audio>
+      </a-assets>
+
+      <a-entity gltf-model="#modeloCaral" position="0 0 -3" scale="2 2 2"></a-entity>
+      <a-text value="Cultura Caral: Primera civilización de América" position="0 2.5 -3" align="center" width="6" color="#FFFFFF"></a-text>
+      <a-text value="Descubierta por Ruth Shady en 1994" position="0 2 -3" align="center" width="5" color="yellow"></a-text>
+      <a-entity sound="src: #audioCaral; autoplay: true"></a-entity>
+
+      <a-box position="0 0.3 -2" width="1.5" height="0.5" depth="0.1" color="#4CAF50"
+             event-set__enter="_event: mouseenter; color: #81C784"
+             event-set__leave="_event: mouseleave; color: #4CAF50"
+             onclick="window.location.href='../index.html'">
+      </a-box>
+      <a-text value="Volver al Mapa" position="0 0.5 -2.01" align="center" width="3"></a-text>
+    </a-scene>
+  </body>
+</html>
