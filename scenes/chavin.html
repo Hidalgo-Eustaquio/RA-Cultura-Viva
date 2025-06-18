@@ -5,26 +5,48 @@
     <meta charset="utf-8">
     <title>Cultura Chavín</title>
     <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
-    <link rel="stylesheet" href="../style.css">
   </head>
   <body>
     <a-scene>
       <a-assets>
-        <a-asset-item id="modeloChavin" src="../assets/models/chavin.glb"></a-asset-item>
-        <audio id="audioChavin" src="../assets/audio/chavin.mp3" preload="auto"></audio>
+        <a-asset-item id="modeloCeramica" src="../assets/modelos/ceramica_chavin.glb"></a-asset-item>
+        <img id="descubridor" src="../assets/imagenes/descubridor_chavin.jpg">
+        <audio id="audioExplicativo" src="../assets/audios/chavin_audio.mp3"></audio>
+        <video id="videoCultura" src="../assets/videos/chavin_video.mp4" crossorigin="anonymous"></video>
+        <track kind="subtitles" src="../assets/subtitulos/chavin_sub.vtt" srclang="es" label="Español" default></track>
       </a-assets>
 
-      <a-entity gltf-model="#modeloChavin" position="0 0 -3" scale="2 2 2"></a-entity>
-      <a-text value="Cultura Chavín: Centro religioso y cultural" position="0 2.5 -3" align="center" width="6" color="#FFFFFF"></a-text>
-      <a-text value="Descubierta por Julio C. Tello en 1919" position="0 2 -3" align="center" width="5" color="yellow"></a-text>
-      <a-entity sound="src: #audioChavin; autoplay: true"></a-entity>
+      <a-entity gltf-model="#modeloCeramica" position="0 1.2 -3" scale="1 1 1" rotation="0 180 0"></a-entity>
 
-      <a-box position="0 0.3 -2" width="1.5" height="0.5" depth="0.1" color="#4CAF50"
-             event-set__enter="_event: mouseenter; color: #81C784"
-             event-set__leave="_event: mouseleave; color: #4CAF50"
-             onclick="window.location.href='../index.html'">
-      </a-box>
-      <a-text value="Volver al Mapa" position="0 0.5 -2.01" align="center" width="3"></a-text>
+      <a-image src="#descubridor" position="-1.5 1 -2" width="1.5" height="1.2"></a-image>
+
+      <a-sound src="#audioExplicativo" autoplay="false" on="click"></a-sound>
+
+      <a-video src="#videoCultura" width="3" height="1.5" position="1.5 1 -2" autoplay="false">
+        <track kind="subtitles" src="../assets/subtitulos/chavin_sub.vtt" srclang="es" label="Español" default></track>
+      </a-video>
+
+      <!-- Botón para reproducir audio -->
+      <a-plane position="-1.5 0.3 -2" width="0.8" height="0.3" color="#FF5722" class="clickable"
+               onclick="document.querySelector('#audioExplicativo').components.sound.playSound()">
+        <a-text value="Escuchar audio" align="center" position="0 0 0.01" color="white"></a-text>
+      </a-plane>
+
+      <!-- Botón para reproducir video -->
+      <a-plane position="1.5 0.3 -2" width="0.8" height="0.3" color="#3F51B5" class="clickable"
+               onclick="document.querySelector('#videoCultura').play()">
+        <a-text value="Ver video" align="center" position="0 0 0.01" color="white"></a-text>
+      </a-plane>
+
+      <!-- Botón para regresar -->
+      <a-plane position="0 0.3 -1" width="1" height="0.3" color="#009688" class="clickable"
+               onclick="location.href='../index.html'">
+        <a-text value="Regresar al mapa" align="center" position="0 0 0.01" color="white"></a-text>
+      </a-plane>
+
+      <a-entity camera>
+        <a-cursor raycaster="objects: .clickable"></a-cursor>
+      </a-entity>
     </a-scene>
   </body>
 </html>
