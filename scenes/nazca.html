@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Cultura Nazca</title>
+    <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
+    <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+  </head>
+  <body style="margin: 0; overflow: hidden;">
+    <a-scene embedded vr-mode-ui="enabled: false" arjs="sourceType: webcam; debugUIEnabled: false;">
+      <a-assets>
+        <!-- Modelo 3D -->
+        <a-asset-item id="modeloCeramica" src="../assets/modelos/colibri_nazca.glb"></a-asset-item>
+        <!-- Imagen -->
+        <img id="descubridorImg" src="../assets/imagenes/descubridor_nazca.jpg">
+        <!-- Audio -->
+        <audio id="nazcaAudio" src="../assets/audios/nazca_audio.mp3"></audio>
+        <!-- Video -->
+        <video id="nazcaVideo" src="../assets/videos/nazca_video.mp4" crossorigin="anonymous"></video>
+      </a-assets>
+
+      <a-marker preset="hiro">
+        <!-- Modelo 3D -->
+      
+
+        <a-entity
+          gltf-model="#modeloCeramica"
+          position="0 -2 -1"
+          rotation="0 45 0"
+          scale="0.1 0.1 0.1"
+          pinch-to-zoom
+          mousewheel-zoom>
+        </a-entity>
+
+        <!-- Imagen del descubridor -->
+        <a-image
+          src="#descubridorImg"
+          position="-1.5 0 -3"
+          width="1.5"
+          height="1.2"
+          >
+        </a-image>
+
+        <!-- Sonido explicativo -->
+        <a-sound
+          id="sonidoNazca"
+          src="#nazcaAudio"
+          autoplay="false">
+        </a-sound>
+
+        <!-- Video con subtítulos -->
+        <a-video
+          src="#nazcaVideo"
+          width="3"
+          height="1.5"
+          position="1.5 0 -3"
+          autoplay="false"
+          >
+          <track
+            kind="subtitles"
+            src="../assets/subtitulos/nazca.vtt"
+            srclang="es"
+            label="Español"
+            default>
+          </track>
+        </a-video>
+
+        <!-- Botón: Escuchar audio -->
+        <a-plane
+          position="-1.5 -0.5 -3"
+          width="0.8"
+          height="0.3"
+          color="#FF5722"
+          class="clickable"
+          onclick="document.querySelector('#sonidoNazca').components.sound.playSound()">
+          <a-text
+            value="Escuchar audio"
+            align="center"
+            position="-1.5 -0.5 -3"
+            color="white">
+          </a-text>
+        </a-plane>
+
+        <!-- Botón: Ver video -->
+        <a-plane
+          position="1.5 -0.5 -3"
+          width="0.8"
+          height="0.3"
+          color="#3F51B5"
+          class="clickable"
+          onclick="document.querySelector('#nazcaVideo').play()">
+          <a-text
+            value="Ver video"
+            align="center"
+            position="0 -0.5 0.01"
+            color="white">
+          </a-text>
+        </a-plane>
+
+        <!-- Botón: Regresar al mapa -->
+        <a-plane
+          position="0 -0.6 -2"
+          width="1"
+          height="0.3"
+          color="#009688"
+          class="clickable"
+          onclick="location.href='../index.html'">
+          <a-text
+            value="Regresar al mapa"
+            align="center"
+            position="0 -0.6 0.01"
+            color="white">
+          </a-text>
+        </a-plane>
+      </a-marker>
+
+      <!-- Cámara y cursor desactivando fuse -->
+      <a-entity camera>
+        <a-cursor
+          fuse="false"
+          raycaster="objects: .clickable">
+        </a-cursor>
+      </a-entity>
+    </a-scene>
+
+    <script>
+      AFRAME.registerComponent('pinch-to-zoom', {
+        schema: { min: {default: 0.5}, max: {default: 3} },
+        init: function () {
+          const el = this.el;
+          let initialDistance = null;
+          let initialScale = el.object3D.scale.x;
+          this.el.sceneEl.canvas.addEventListener('touchstart', (e) => {
+            if (e.touches.length === 2) {
+              const dx = e.touches[0].clientX - e.touches[1].clientX;
+              const dy = e.touches[0].clientY - e.touches[1].clientY;
+              initialDistance = Math.sqrt(dx * dx + dy * dy);
+              initialScale = el.object3D.scale.x;
+            }
+          }, false);
+          this.el.sceneEl.canvas.addEventListener('touchmove', (e) => {
+            if (e.touches.length === 2 && initialDistance) {
+              const dx = e.touches[0].clientX - e.touches[1].clientX;
+              const dy = e.touches[0].clientY - e.touches[1].clientY;
+              const currentDistance = Math.sqrt(dx * dx + dy * dy);
+              let scaleFactor = currentDistance / initialDistance;
+              scaleFactor = Math.max(this.data.min / initialScale, Math.min(this.data.max / initialScale, scaleFactor));
+              el.object3D.scale.setScalar(initialScale * scaleFactor);
+            }
+          }, false);
+        }
+      });
+
+      AFRAME.registerComponent('mousewheel-zoom', {
+        schema: { min: {default: 0.5}, max: {default: 3}, sensitivity: {default: 0.05} },
+        init: function () {
+          const el = this.el;
+          const self = this;
+          window.addEventListener('wheel', function (e) {
+            const scale = el.object3D.scale.x;
+            const delta = e.deltaY > 0 ? -self.data.sensitivity : self.data.sensitivity;
+            let newScale = scale + delta;
+            newScale = Math.max(self.data.min, Math.min(self.data.max, newScale));
+            el.object3D.scale.set(newScale, newScale, newScale);
+          });
+        }
+      });
+     
+      // Componente para ajustar el modelo 3D al marcador
+      AFRAME.registerComponent('fit-to-marker', {
+        init: function() {
+          this.el.addEventListener('model-loaded', () => {
+            const obj = this.el.getObject3D('mesh');
+            const box = new THREE.Box3().setFromObject(obj);
+            const size = box.getSize(new THREE.Vector3());
+            const markerWidth = 1; // 1 unidad = ancho del marcador
+            const maxDim = Math.max(size.x, size.y, size.z);
+            const scale = markerWidth / maxDim * 0.8; // 80% del ancho
+            this.el.object3D.scale.set(scale, scale, scale);
+          });
+        }
+      });
+    </script>
+
+  </body>
+</html>
