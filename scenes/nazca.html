@@ -1,240 +1,178 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <meta charset="utf-8">
-    <title>Cultura Nazca</title>
+    <meta charset="utf-8" />
+    <title>RA Cultura Viva – Nazca</title>
+    <!-- A-Frame & AR.js -->
     <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+    <!-- Google Model Viewer -->
+    <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+    <style>
+      html, body { margin:0; padding:0; width:100%; height:100%; overflow:hidden; }
+      a-scene { position:absolute; top:0; left:0; width:100%; height:100%; }
+      /* HUD above everything */
+      .hud-ui { position:absolute; left:0; right:0; pointer-events:auto; z-index:30; }
+      #hud-header { top:0; height:50px; background:rgba(0,0,0,0.7); color:white; text-align:center; line-height:50px; font-size:20px; }
+      #hud-back { bottom:15px; left:50%; transform:translateX(-50%); background:#4CAF50; color:white; padding:12px 16px; font-size:18px; border:none; border-radius:4px; cursor:pointer; }
+      .hud-menu { top:60px; display:flex; gap:10px; justify-content:center; }
+      .hud-menu button { background:#4CAF50; color:white; padding:12px 16px; font-size:18px; border:none; border-radius:4px; cursor:pointer; }
+      #hud-panel { bottom:100px; left:50%; transform:translateX(-50%); width:90%; max-width:400px; height:250px; background:rgba(0,0,0,0.8); color:white; padding:10px; box-sizing:border-box; overflow:auto; }
+      .hidden { display:none !important; }
+      /* Fullscreen 3D Viewer behind HUD */
+      #model-viewer-container { position:absolute; top:0; left:0; width:100%; height:100%; background:transparent; display:flex; align-items:center; justify-content:center; pointer-events:none; z-index:10; }
+      #model-viewer-container.hidden { display:none !important; }
+      model-viewer { width:100%; height:100%; background:transparent; pointer-events:auto; }
+      /* Viewer arrows still intercept */
+      .overlay-button { position:absolute; background:rgba(0,0,0,0.5); color:white; border:none; padding:12px; font-size:18px; cursor:pointer; z-index:20; border-radius:4px; pointer-events:auto; }
+      #btn-prev  { left:20px; top:50%; transform:translateY(-50%); }
+      #btn-next  { right:20px; top:50%; transform:translateY(-50%); }
+    </style>
   </head>
-  <body style="margin: 0; overflow: hidden;">
-    <a-scene embedded vr-mode-ui="enabled: false" arjs="sourceType: webcam; debugUIEnabled: false;">
-      <a-assets>
-        <!-- Modelo 3D -->
-        <a-asset-item id="modeloCeramica" src="../assets/modelos/colibri_nazca.glb"></a-asset-item>
-        <!-- Imagen -->
-        <img id="descubridorImg" src="../assets/imagenes/descubridor_nazca.jpg">
-        <!-- Audio -->
-        <audio id="nazcaAudio" src="../assets/audios/nazca_audio.mp3"></audio>
-        <!-- Video -->
-        <video id="nazcaVideo" src="../assets/videos/nazca_video.mp4" crossorigin="anonymous"></video>
-        <!-- iconos de reprodicir/pausar/stop -->
-        <img id="icon-play"  src="../assets/iconos/play.png">
-        <img id="icon-pause" src="../assets/iconos/pause.png">
-        <img id="icon-stop"  src="../assets/iconos/stop.png">
 
-        <img id="icon-back" src="../assets/iconos/regresar.png">
-      </a-assets>
-
+  <body>
+    <!-- AR.js scene -->
+    <a-scene vr-mode-ui="enabled:false" loading-screen="enabled:false" arjs="sourceType:webcam; debugUIEnabled:false">
       <a-marker preset="hiro">
-        <!-- Modelo 3D -->
-        <a-entity
-          gltf-model="#modeloCeramica"
-          position="0 -2 -1"
-          rotation="0 45 0"
-          scale="0.2 0.2 0.2"
-          pinch-to-zoom
-          mousewheel-zoom>
-        </a-entity>
-
-        <!-- Imagen del descubridor -->
-        <a-image
-          src="#descubridorImg"
-          position="-1.5 -1 -3"
-          width="1.5"
-          height="1.2"
-          rotation="0 0 0"
-          >
-        </a-image>
-
-        <!-- Sonido explicativo -->
-        <a-sound
-          id="sonidoNazca"
-          src="#nazcaAudio"
-          autoplay="false">
-        </a-sound>
-
-        <!-- Video con subtítulos -->
-        <a-video
-          src="#nazcaVideo"
-          width="3"
-          height="1.5"
-          position="1.5 -1 -3"
-          autoplay="false"
-          >
-          <track
-            kind="subtitles"
-            src="../assets/subtitulos/nazca.vtt"
-            srclang="es"
-            label="Español"
-            default>
-          </track>
-        </a-video>
-
-        <!-- panel: audio -->
-       <a-entity position="-2 -1.5 -2.9">
-          <!-- Play -->
-          <a-image
-            src="#icon-play"
-            width="0.3"
-            height="0.3"
-            class="clickable"
-            onclick="document.querySelector('#sonidoNazca').components.sound.playSound()">
-          </a-image>
-
-          <!-- Pause -->
-          <a-image
-            src="#icon-pause"
-            position="0.5 0 0"
-            width="0.3"
-            height="0.3"
-            class="clickable"
-            onclick="document.querySelector('#sonidoNazca').components.sound.pauseSound()">
-          </a-image>
-
-          <!-- Stop -->
-          <a-image
-            src="#icon-stop"
-            position="1 0 0"
-            width="0.3"
-            height="0.3"
-            class="clickable"
-            onclick="document.querySelector('#sonidoNazca').components.sound.stopSound()">
-          </a-image>
-        </a-entity>
-
-        <!-- Controles de reproductor de video -->
-        <a-entity position="1 -1.5 -2.9">
-          <!-- Play -->
-          <a-image
-            src="#icon-play"
-            width="0.3"
-            height="0.3"
-            class="clickable"
-            onclick="document.querySelector('#nazcaVideo').play()">
-          </a-image>
-
-          <!-- Pause -->
-          <a-image
-            src="#icon-pause"
-            position="0.5 0 0"
-            width="0.3"
-            height="0.3"
-            class="clickable"
-            onclick="document.querySelector('#nazcaVideo').pause()">
-          </a-image>
-
-          <!-- Stop -->
-          <a-image
-            src="#icon-stop"
-            position="1 0 0"
-            width="0.3"
-            height="0.3"
-            class="clickable"
-            onclick="
-              const v = document.querySelector('#nazcaVideo');
-              v.pause();
-              v.currentTime = 0;
-            ">
-          </a-image>
-        </a-entity>
-
-        <!-- Botón: Regresar al mapa -->
-        <a-plane
-          position="-0.3 -1.3 -2"
-          width="1"
-          height="0.3"
-          color="#009688"
-          class="clickable"                             
-          onclick="window.location.href='../index.html'"
-        >
-          <!-- icono -->
-          <a-image
-            src="#icon-back"
-            width="0.25"
-            height="0.25"
-            position="-0.35 0 0.05">
-          </a-image>
-
-          <!-- texto -->
-          <a-text
-            value="Regresar al mapa"
-        
-            width="0.50"
-            position="-0.2 0 0.05"
-            color="white"
-            scale="4 4 4">
-          </a-text>
-        </a-plane>
-
+        <a-entity gltf-model="../assets/modelos/colibri_nazca.glb" scale="0.2 0.2 0.2" position="0 -1 0" rotation="0 45 0"></a-entity>
       </a-marker>
-
-      <!-- Cámara y cursor desactivando fuse -->
-      <a-entity camera>
-        <a-cursor
-          fuse="false"
-          raycaster="objects: .clickable">
-        </a-cursor>
-      </a-entity>
+      <a-entity camera></a-entity>
     </a-scene>
 
+    <!-- HUD -->
+    <div id="hud-header" class="hud-ui">NAZCA</div>
+    <div id="hud-back" class="hud-ui" onclick="location.href='../index.html'">← Back to map</div>
+
+    <div id="menu-front" class="hud-ui hud-menu">
+      <button data-key="ubicacion">Ubicación ▶</button>
+      <button data-key="descubridor">Descubridor ▶</button>
+      <button data-key="sociedad">Sociedad ▶</button>
+    </div>
+    <div id="menu-left" class="hud-ui hud-menu hidden">
+      <button data-key="economia">Economía ▶</button>
+      <button data-key="arquitectura">Arquitectura ▶</button>
+    </div>
+    <div id="menu-right" class="hud-ui hud-menu hidden">
+      <button data-key="ceramica">Cerámica ▶</button>
+      <button data-key="geoglifo">Geoglifos ▶</button>
+    </div>
+
+    <!-- Text/Audio Panel -->
+    <div id="hud-panel" class="hud-ui hidden"></div>
+
+    <!-- Fullscreen 3D Viewer -->
+    <div id="model-viewer-container" class="hidden">
+      <button id="btn-prev"  class="overlay-button">◀</button>
+      <button id="btn-next"  class="overlay-button">▶</button>
+      <model-viewer id="mv" camera-controls interaction-prompt="none" exposure="1.2" shadow-intensity="0.5"></model-viewer>
+    </div>
+
     <script>
-      AFRAME.registerComponent('pinch-to-zoom', {
-        schema: { min: {default: 0.05}, max: {default: 2} },
-        init: function () {
-          const el = this.el;
-          let initialDistance = null;
-          let initialScale = el.object3D.scale.x;
-          this.el.sceneEl.canvas.addEventListener('touchstart', (e) => {
-            if (e.touches.length === 2) {
-              const dx = e.touches[0].clientX - e.touches[1].clientX;
-              const dy = e.touches[0].clientY - e.touches[1].clientY;
-              initialDistance = Math.sqrt(dx * dx + dy * dy);
-              initialScale = el.object3D.scale.x;
-            }
-          }, false);
-          this.el.sceneEl.canvas.addEventListener('touchmove', (e) => {
-            if (e.touches.length === 2 && initialDistance) {
-              const dx = e.touches[0].clientX - e.touches[1].clientX;
-              const dy = e.touches[0].clientY - e.touches[1].clientY;
-              const currentDistance = Math.sqrt(dx * dx + dy * dy);
-              let scaleFactor = currentDistance / initialDistance;
-              scaleFactor = Math.max(this.data.min / initialScale, Math.min(this.data.max / initialScale, scaleFactor));
-              el.object3D.scale.setScalar(initialScale * scaleFactor);
-            }
-          }, false);
-        }
-      });
+      const CONTENT = {
+        ubicacion:    { audio:'../assets/audios/nazca_ubicacion.mp3',    text:'Nazca se ubica en la costa sur del Perú...' },
+        descubridor:  { audio:'../assets/audios/nazca_descubridor.mp3',   text:'Paul Kosok (1939) y otros exploradores...' },
+        sociedad:     { audio:'../assets/audios/nazca_sociedad.mp3',     video:'../assets/videos/nazca_video.mp4', text:'La sociedad nazca estaba organizada en...' },
+        economia:     { audio:'../assets/audios/nazca_economia.mp3',     text:'Su economía giraba en torno a la agricultura...' },
+        arquitectura: { audio:'../assets/audios/nazca_arquitectura.mp3', text:'Las líneas y acueductos demuestran...' },
+        ceramica:    { models:[
+                           '../assets/modelos/nazca/ceramica/objeto_01_nasca.glb',
+                           '../assets/modelos/nazca/ceramica/objeto_02_nasca.glb',
+                           '../assets/modelos/nazca/ceramica/objeto_03_nasca.glb',
+                           '../assets/modelos/nazca/ceramica/objeto_04_nasca.glb',
+                           '../assets/modelos/nazca/ceramica/objeto_05_nasca.glb',
+                           '../assets/modelos/nazca/ceramica/objeto_06_nasca.glb',
+                           '../assets/modelos/nazca/ceramica/objeto_07_nasca.glb'
+                         ]},
+        geoglifo:    { models:[
+                           '../assets/modelos/nazca/geoglifo/1_el_colibri_lineas_de_nazca.glb',
+                           '../assets/modelos/nazca/geoglifo/2_the_astronaut_geoglyph_in_nazca_peru.glb',                         
+                           '../assets/modelos/nazca/geoglifo/3_nazca_lines_tree_and_hands_peru.glb',
+                           '../assets/modelos/nazca/geoglifo/4_nazca_lines_spider_peru.glb',
+                           '../assets/modelos/nazca/geoglifo/unearthing_nazca_mummy.glb'
+                         ]}
+      };
 
-      AFRAME.registerComponent('mousewheel-zoom', {
-        schema: { min: {default: 0.05}, max: {default: 2}, sensitivity: {default: 0.05} },
-        init: function () {
-          const el = this.el;
-          const self = this;
-          window.addEventListener('wheel', function (e) {
-            const scale = el.object3D.scale.x;
-            const delta = e.deltaY > 0 ? -self.data.sensitivity : self.data.sensitivity;
-            let newScale = scale + delta;
-            newScale = Math.max(self.data.min, Math.min(self.data.max, newScale));
-            el.object3D.scale.set(newScale, newScale, newScale);
+      // DOM refs
+      const panel       = document.getElementById('hud-panel');
+      const mvContainer = document.getElementById('model-viewer-container');
+      const mv          = document.getElementById('mv');
+      const btnPrev     = document.getElementById('btn-prev');
+      const btnNext     = document.getElementById('btn-next');
+      let currentAudio;
+      let models = [], idx = 0;
+      let lastRegion = null;
+
+      function showText(key) {
+        mvContainer.classList.add('hidden');
+        panel.innerHTML = '';
+        panel.classList.remove('hidden');
+        if (currentAudio) { currentAudio.pause(); currentAudio.currentTime = 0; }
+        const prevVid = panel.querySelector('video'); if (prevVid) { prevVid.pause(); }
+        const info = CONTENT[key];
+        const c = document.createElement('button'); c.textContent = '✖';
+        Object.assign(c.style, { position:'absolute', top:'5px', right:'5px', background:'none', border:'none', color:'white', fontSize:'24px', cursor:'pointer'});
+        c.onclick = () => panel.classList.add('hidden'); panel.appendChild(c);
+        if (info.audio) {
+          currentAudio = new Audio(info.audio);
+          ['▶','⏸','⏹'].forEach(sym => {
+            const b = document.createElement('button'); b.textContent = sym; b.style.margin='0 8px';
+            b.onclick = { '▶': ()=> currentAudio.play(), '⏸': ()=> currentAudio.pause(), '⏹': ()=> { currentAudio.pause(); currentAudio.currentTime=0; } }[sym];
+            panel.appendChild(b);
           });
         }
-      });
-     
-      // Componente para ajustar el modelo 3D al marcador
-      AFRAME.registerComponent('fit-to-marker', {
-        init: function() {
-          this.el.addEventListener('model-loaded', () => {
-            const obj = this.el.getObject3D('mesh');
-            const box = new THREE.Box3().setFromObject(obj);
-            const size = box.getSize(new THREE.Vector3());
-            const markerWidth = 1; // 1 unidad = ancho del marcador
-            const maxDim = Math.max(size.x, size.y, size.z);
-            const scale = markerWidth / maxDim * 0.8; // 80% del ancho
-            this.el.object3D.scale.set(scale, scale, scale);
-          });
+        if (info.text) {
+          const r = document.createElement('button'); r.textContent = '📖'; r.style.margin='0 8px';
+          r.onclick = () => panel.innerHTML = `<p>${info.text}</p>`;
+          panel.appendChild(r);
         }
-      });
+        if (info.video) {
+          const v = document.createElement('button'); v.textContent = '📹';
+          v.onclick = () => panel.innerHTML = `<video src='${info.video}' controls autoplay style='width:100%;height:100%'></video>`;
+          panel.appendChild(v);
+        }
+      }
+
+      function openViewer(key) {
+        panel.classList.add('hidden');
+        if (currentAudio) { currentAudio.pause(); currentAudio.currentTime = 0; }
+        models = CONTENT[key].models; idx = 0;
+        mv.src = models[0];
+        mvContainer.classList.remove('hidden');
+      }
+
+      btnPrev.onclick = () => { idx = (idx - 1 + models.length) % models.length; mv.src = models[idx]; };
+      btnNext.onclick = () => { idx = (idx + 1) % models.length; mv.src = models[idx]; };
+
+      document.querySelectorAll('.hud-menu button').forEach(btn => btn.addEventListener('click', () => {
+        const key = btn.dataset.key;
+        if (key === 'ceramica' || key === 'geoglifo') openViewer(key);
+        else showText(key);
+      }));
+
+      // Orientation-based menus + pause media
+      const marker = document.querySelector('a-marker');
+      const front  = document.getElementById('menu-front');
+      const left   = document.getElementById('menu-left');
+      const right  = document.getElementById('menu-right');
+      function updateMenus() {
+        const y = THREE.Math.radToDeg(marker.object3D.rotation.y);
+        let region = 'front';
+        if (y > 45 && y < 135)      region = 'left';
+        else if (y < -45 && y > -135) region = 'right';
+        // pause media & close viewer on region change
+        if (lastRegion !== null && region !== lastRegion) {
+          if (!panel.classList.contains('hidden')) {
+            if (currentAudio) { currentAudio.pause(); currentAudio.currentTime = 0; }
+            const v = panel.querySelector('video'); if (v) v.pause();
+          }
+          if (!mvContainer.classList.contains('hidden')) mvContainer.classList.add('hidden');
+        }
+        lastRegion = region;
+        front.classList.toggle('hidden', region !== 'front');
+        left .classList.toggle('hidden', region !== 'left');
+        right.classList.toggle('hidden', region !== 'right');
+      }
+      (function tick() { if (marker.object3D) updateMenus(); requestAnimationFrame(tick); })();
     </script>
-
   </body>
 </html>
