@@ -3,35 +3,28 @@
   <head>
     <meta charset="utf-8" />
     <title>RA Cultura Viva – Nazca</title>
-    <!-- A-Frame & AR.js -->
     <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
-    <!-- Google Model Viewer -->
     <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
     <style>
       html, body { margin:0; padding:0; width:100%; height:100%; overflow:hidden; }
       a-scene { position:absolute; top:0; left:0; width:100%; height:100%; }
-      /* HUD above everything */
       .hud-ui { position:absolute; left:0; right:0; pointer-events:auto; z-index:30; }
       #hud-header { top:0; height:50px; background:rgba(0,0,0,0.7); color:white; text-align:center; line-height:50px; font-size:20px; }
       #hud-back { bottom:15px; left:50%; transform:translateX(-50%); background:#4CAF50; color:white; padding:12px 16px; font-size:18px; border:none; border-radius:4px; cursor:pointer; }
       .hud-menu { top:60px; display:flex; gap:10px; justify-content:center; }
       .hud-menu button { background:#4CAF50; color:white; padding:12px 16px; font-size:18px; border:none; border-radius:4px; cursor:pointer; }
-      #hud-panel { bottom:100px; left:50%; transform:translateX(-50%); width:90%; max-width:400px; height:250px; background:rgba(0,0,0,0.8); color:white; padding:10px; box-sizing:border-box; overflow:auto; }
+      #hud-panel { bottom:100px; left:50%; transform:translateX(-50%); width:90%; max-width:400px; height:250px; background:rgba(0,0,0,0.8); color:white; padding:10px; box-sizing:border-box; overflow:auto; position:absolute; }
       .hidden { display:none !important; }
-      /* Fullscreen 3D Viewer behind HUD */
       #model-viewer-container { position:absolute; top:0; left:0; width:100%; height:100%; background:transparent; display:flex; align-items:center; justify-content:center; pointer-events:none; z-index:10; }
       #model-viewer-container.hidden { display:none !important; }
       model-viewer { width:100%; height:100%; background:transparent; pointer-events:auto; }
-      /* Viewer arrows still intercept */
       .overlay-button { position:absolute; background:rgba(0,0,0,0.5); color:white; border:none; padding:12px; font-size:18px; cursor:pointer; z-index:20; border-radius:4px; pointer-events:auto; }
       #btn-prev  { left:20px; top:50%; transform:translateY(-50%); }
       #btn-next  { right:20px; top:50%; transform:translateY(-50%); }
     </style>
   </head>
-
   <body>
-    <!-- AR.js scene -->
     <a-scene vr-mode-ui="enabled:false" loading-screen="enabled:false" arjs="sourceType:webcam; debugUIEnabled:false">
       <a-marker preset="hiro">
         <a-entity gltf-model="../assets/modelos/colibri_nazca.glb" scale="0.2 0.2 0.2" position="0 -1 0" rotation="0 45 0"></a-entity>
@@ -39,28 +32,25 @@
       <a-entity camera></a-entity>
     </a-scene>
 
-    <!-- HUD -->
     <div id="hud-header" class="hud-ui">NAZCA</div>
-    <div id="hud-back" class="hud-ui" onclick="location.href='../index.html'">← Back to map</div>
+    <div id="hud-back" class="hud-ui" onclick="location.href='../index.html'">← IR AL MAPA</div>
 
     <div id="menu-front" class="hud-ui hud-menu">
-      <button data-key="ubicacion">Ubicación ▶</button>
-      <button data-key="descubridor">Descubridor ▶</button>
-      <button data-key="sociedad">Sociedad ▶</button>
+      <button data-key="ubicacion">Ubicación</button>
+      <button data-key="descubridor">Descubridor</button>
+      <button data-key="sociedad">Sociedad</button>
     </div>
     <div id="menu-left" class="hud-ui hud-menu hidden">
-      <button data-key="economia">Economía ▶</button>
-      <button data-key="arquitectura">Arquitectura ▶</button>
+      <button data-key="economia">Economía</button>
+      <button data-key="arquitectura">Arquitectura</button>
     </div>
     <div id="menu-right" class="hud-ui hud-menu hidden">
-      <button data-key="ceramica">Cerámica ▶</button>
-      <button data-key="geoglifo">Geoglifos ▶</button>
+      <button data-key="ceramica">Cerámica (3D)</button>
+      <button data-key="geoglifo">Geoglifos (3D)</button>
     </div>
 
-    <!-- Text/Audio Panel -->
     <div id="hud-panel" class="hud-ui hidden"></div>
 
-    <!-- Fullscreen 3D Viewer -->
     <div id="model-viewer-container" class="hidden">
       <button id="btn-prev"  class="overlay-button">◀</button>
       <button id="btn-next"  class="overlay-button">▶</button>
@@ -69,72 +59,118 @@
 
     <script>
       const CONTENT = {
-        ubicacion:    { audio:'../assets/audios/nazca_ubicacion.mp3',    text:'Nazca se ubica en la costa sur del Perú...' },
-        descubridor:  { audio:'../assets/audios/nazca_descubridor.mp3',   text:'Paul Kosok (1939) y otros exploradores...' },
-        sociedad:     { audio:'../assets/audios/nazca_sociedad.mp3',     video:'../assets/videos/nazca_video.mp4', text:'La sociedad nazca estaba organizada en...' },
-        economia:     { audio:'../assets/audios/nazca_economia.mp3',     text:'Su economía giraba en torno a la agricultura...' },
-        arquitectura: { audio:'../assets/audios/nazca_arquitectura.mp3', text:'Las líneas y acueductos demuestran...' },
-        ceramica:    { models:[
-                           '../assets/modelos/nazca/ceramica/objeto_01_nasca.glb',
-                           '../assets/modelos/nazca/ceramica/objeto_02_nasca.glb',
-                           '../assets/modelos/nazca/ceramica/objeto_03_nasca.glb',
-                           '../assets/modelos/nazca/ceramica/objeto_04_nasca.glb',
-                           '../assets/modelos/nazca/ceramica/objeto_05_nasca.glb',
-                           '../assets/modelos/nazca/ceramica/objeto_06_nasca.glb',
-                           '../assets/modelos/nazca/ceramica/objeto_07_nasca.glb'
-                         ]},
-        geoglifo:    { models:[
-                           '../assets/modelos/nazca/geoglifo/1_el_colibri_lineas_de_nazca.glb',
-                           '../assets/modelos/nazca/geoglifo/2_the_astronaut_geoglyph_in_nazca_peru.glb',                         
-                           '../assets/modelos/nazca/geoglifo/3_nazca_lines_tree_and_hands_peru.glb',
-                           '../assets/modelos/nazca/geoglifo/4_nazca_lines_spider_peru.glb',
-                           '../assets/modelos/nazca/geoglifo/unearthing_nazca_mummy.glb'
-                         ]}
+        ubicacion:    { audio:'../assets/audios/nazca_ubicacion.mp3',    text:'Se ubica en la costa sur del Perú, principalmente en la cuenca del río Grande, en el departamento de Ica.' },
+        descubridor:  { audio:'../assets/audios/nazca_descubridor.mp3',   text:'Max Uhle en 1901, Joyce le puso Nazca en 1911.' },
+        sociedad:     { audio:'../assets/audios/nazca_sociedad.mp3',     video:'../assets/videos/nazca_video.mp4', text:'Teocrático-militar, el poder político emana de una interpretación religiosa y es ejercido por líderes militares que también son figuras religiosas o que actúan bajo la dirección de autoridades religiosas. Un guerrero, desde que era adolescente, estaba preocupado por capturar y cortar la mayor cantidad de cabezas de sus enemigos. Mientras más cabezas le colgaran en la cintura, demostraba mayor virilidad. Si no tenía cabezas trofeo no tenía derecho a tener mujer. A esto se le conoce como cabezas trofeo.' },
+        economia:     { audio:'../assets/audios/nazca_economia.mp3',     text:'Su economía giraba en torno a la Agricultura de regadío o intensiva, pesca, comercio con Huarpa, quienes les daban lana y papa a cambio de pescado y algodón. Sacaban agua del subsuelo con acueductos subterráneos.' },
+        arquitectura: { audio:'../assets/audios/nazca_arquitectura.mp3', text:'Construyeron con material de adobe y quincha (caña y barro) Cahuachi: Considerado la capital de Nazca. Fue estudiado por el italiano Giuseppe Orefice quien sostiene que no es una ciudad, sino un centro ceremonial; un enorme centro de culto y ceremonias. La Estaquería: 240 postes de huarango. Se cree que fue la base de un observatorio astronómico. Actualmente, no está completo porque muchos han sido robados para venderlos para hacer carbón.' },
+        ceramica:     { models:[ '../assets/modelos/nazca/ceramica/objeto_01_nasca.glb','../assets/modelos/nazca/ceramica/objeto_02_nasca.glb','../assets/modelos/nazca/ceramica/objeto_03_nasca.glb','../assets/modelos/nazca/ceramica/objeto_04_nasca.glb','../assets/modelos/nazca/ceramica/objeto_05_nasca.glb','../assets/modelos/nazca/ceramica/objeto_06_nasca.glb','../assets/modelos/nazca/ceramica/objeto_07_nasca.glb']},
+        geoglifo:     { models:[ '../assets/modelos/nazca/geoglifo/1_el_colibri_lineas_de_nazca.glb','../assets/modelos/nazca/geoglifo/2_the_astronaut_geoglyph_in_nazca_peru.glb','../assets/modelos/nazca/geoglifo/3_nazca_lines_tree_and_hands_peru.glb','../assets/modelos/nazca/geoglifo/4_nazca_lines_spider_peru.glb','../assets/modelos/nazca/geoglifo/unearthing_nazca_mummy.glb']}
       };
 
-      // DOM refs
-      const panel       = document.getElementById('hud-panel');
+      const panel = document.getElementById('hud-panel');
       const mvContainer = document.getElementById('model-viewer-container');
-      const mv          = document.getElementById('mv');
-      const btnPrev     = document.getElementById('btn-prev');
-      const btnNext     = document.getElementById('btn-next');
-      let currentAudio;
+      const mv = document.getElementById('mv');
+      const btnPrev = document.getElementById('btn-prev');
+      const btnNext = document.getElementById('btn-next');
+      let currentAudio, currentVideo;
       let models = [], idx = 0;
       let lastRegion = null;
 
       function showText(key) {
-        mvContainer.classList.add('hidden');
         panel.innerHTML = '';
         panel.classList.remove('hidden');
         if (currentAudio) { currentAudio.pause(); currentAudio.currentTime = 0; }
-        const prevVid = panel.querySelector('video'); if (prevVid) { prevVid.pause(); }
+        if (currentVideo) { currentVideo.pause(); currentVideo.remove(); currentVideo = null; }
+
         const info = CONTENT[key];
-        const c = document.createElement('button'); c.textContent = '✖';
-        Object.assign(c.style, { position:'absolute', top:'5px', right:'5px', background:'none', border:'none', color:'white', fontSize:'24px', cursor:'pointer'});
-        c.onclick = () => panel.classList.add('hidden'); panel.appendChild(c);
+
+        // Crear contenedor de contenido dentro del panel
+        const contentWrapper = document.createElement('div');
+        contentWrapper.id = "panel-content";
+
+        // Botón Cerrar
+        const close = document.createElement('button');
+        close.textContent = '✖';
+        Object.assign(close.style, {
+          position: 'absolute',
+          top: '5px',
+          right: '5px',
+          background: 'none',
+          border: 'none',
+          color: 'white',
+          fontSize: '24px',
+          cursor: 'pointer'
+        });
+        close.onclick = () => panel.classList.add('hidden');
+        panel.appendChild(close);
+
+        // Controles de audio
         if (info.audio) {
           currentAudio = new Audio(info.audio);
           ['▶','⏸','⏹'].forEach(sym => {
-            const b = document.createElement('button'); b.textContent = sym; b.style.margin='0 8px';
-            b.onclick = { '▶': ()=> currentAudio.play(), '⏸': ()=> currentAudio.pause(), '⏹': ()=> { currentAudio.pause(); currentAudio.currentTime=0; } }[sym];
-            panel.appendChild(b);
+            const b = document.createElement('button');
+            b.textContent = sym;
+            b.style.margin = '0 8px';
+            b.onclick = {
+              '▶': () => currentAudio.play(),
+              '⏸': () => currentAudio.pause(),
+              '⏹': () => { currentAudio.pause(); currentAudio.currentTime = 0; }
+            }[sym];
+            contentWrapper.appendChild(b);
           });
         }
+
+        // Botón Leer Texto
         if (info.text) {
-          const r = document.createElement('button'); r.textContent = '📖'; r.style.margin='0 8px';
-          r.onclick = () => panel.innerHTML = `<p>${info.text}</p>`;
-          panel.appendChild(r);
+          const btnText = document.createElement('button');
+          btnText.textContent = '📖';
+          btnText.style.margin = '0 8px';
+          btnText.onclick = () => {
+            if (currentVideo) { currentVideo.pause(); currentVideo.remove(); currentVideo = null; }
+            // Eliminar texto anterior si existe
+            const prevText = document.getElementById('text-block');
+            if (prevText) prevText.remove();
+
+            const p = document.createElement('p');
+            p.id = 'text-block';
+            p.style.marginTop = '10px';
+            p.textContent = info.text;
+            contentWrapper.appendChild(p);
+          };
+          contentWrapper.appendChild(btnText);
         }
+
+        // Botón Video
         if (info.video) {
-          const v = document.createElement('button'); v.textContent = '📹';
-          v.onclick = () => panel.innerHTML = `<video src='${info.video}' controls autoplay style='width:100%;height:100%'></video>`;
-          panel.appendChild(v);
+          const btnVideo = document.createElement('button');
+          btnVideo.textContent = '📹';
+          btnVideo.style.margin = '0 8px';
+          btnVideo.onclick = () => {
+            if (currentAudio) { currentAudio.pause(); currentAudio.currentTime = 0; }
+            if (currentVideo) { currentVideo.pause(); currentVideo.remove(); }
+            const prevText = document.getElementById('text-block');
+            if (prevText) prevText.remove();
+
+            currentVideo = document.createElement('video');
+            currentVideo.src = info.video;
+            currentVideo.controls = true;
+            currentVideo.autoplay = true;
+            currentVideo.style.width = '100%';
+            currentVideo.style.marginTop = '10px';
+            contentWrapper.appendChild(currentVideo);
+          };
+          contentWrapper.appendChild(btnVideo);
         }
+
+        panel.appendChild(contentWrapper);
       }
+
 
       function openViewer(key) {
         panel.classList.add('hidden');
         if (currentAudio) { currentAudio.pause(); currentAudio.currentTime = 0; }
+        if (currentVideo) { currentVideo.pause(); currentVideo.remove(); currentVideo = null; }
         models = CONTENT[key].models; idx = 0;
         mv.src = models[0];
         mvContainer.classList.remove('hidden');
@@ -149,29 +185,30 @@
         else showText(key);
       }));
 
-      // Orientation-based menus + pause media
       const marker = document.querySelector('a-marker');
-      const front  = document.getElementById('menu-front');
-      const left   = document.getElementById('menu-left');
-      const right  = document.getElementById('menu-right');
+      const front = document.getElementById('menu-front');
+      const left  = document.getElementById('menu-left');
+      const right = document.getElementById('menu-right');
+
       function updateMenus() {
         const y = THREE.Math.radToDeg(marker.object3D.rotation.y);
         let region = 'front';
-        if (y > 45 && y < 135)      region = 'left';
+        if (y > 45 && y < 135) region = 'left';
         else if (y < -45 && y > -135) region = 'right';
-        // pause media & close viewer on region change
         if (lastRegion !== null && region !== lastRegion) {
           if (!panel.classList.contains('hidden')) {
             if (currentAudio) { currentAudio.pause(); currentAudio.currentTime = 0; }
-            const v = panel.querySelector('video'); if (v) v.pause();
+            if (currentVideo) { currentVideo.pause(); currentVideo.remove(); currentVideo = null; }
+            panel.classList.add('hidden');
           }
           if (!mvContainer.classList.contains('hidden')) mvContainer.classList.add('hidden');
         }
         lastRegion = region;
         front.classList.toggle('hidden', region !== 'front');
-        left .classList.toggle('hidden', region !== 'left');
+        left.classList.toggle('hidden', region !== 'left');
         right.classList.toggle('hidden', region !== 'right');
       }
+
       (function tick() { if (marker.object3D) updateMenus(); requestAnimationFrame(tick); })();
     </script>
   </body>
