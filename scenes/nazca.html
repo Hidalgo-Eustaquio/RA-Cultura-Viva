@@ -10,16 +10,16 @@
     html, body { margin:0; padding:0; width:100%; height:100%; overflow:hidden; }
     a-scene { position:absolute; top:0; left:0; width:100%; height:100%; }
     .hud-ui { position:absolute; left:0; right:0; pointer-events:auto; z-index:30; }
-    #hud-header { top:0; height:50px; background:rgba(0,0,0,0.7); color:white; text-align:center; line-height:50px; font-size:20px; }
-    #hud-back { bottom:15px; left:50%; transform:translateX(-50%); background:#4CAF50; color:white; padding:12px 16px; font-size:18px; border:none; border-radius:4px; cursor:pointer; }
+    #hud-header { top:0; height:50px; background:rgba(0,0,0,0.9); color:white; text-align:center; line-height:50px; font-size:40px; }
+    #hud-back { bottom:15px; left:50%; transform:translateX(-50%); background:#4CAF50; color:white; padding:12px 16px; font-size:18px; border:2px solid white; border-radius:12px; cursor:pointer; }
     .hud-menu { top:60px; display:flex; gap:10px; justify-content:center; }
-    .hud-menu button { background:#4CAF50; color:white; padding:12px 16px; font-size:18px; border:none; border-radius:4px; cursor:pointer; }
-    #hud-panel { bottom:100px; left:50%; transform:translateX(-50%); width:90%; max-width:400px; height:250px; background:rgba(0,0,0,0.8); color:white; padding:10px; box-sizing:border-box; overflow:auto; position:absolute; }
+    .hud-menu button { background:#4CAF50; color:white; padding:12px 16px; font-size:18px; border: 2px solid white; border-radius:12px; cursor:pointer; }
+    #hud-panel { bottom:70px; left:50%; transform:translateX(-50%); width:90%; max-width:400px; height:250px; background:rgba(0,0,0,0.9); color:white; padding:10px; box-sizing:border-box; overflow:auto; position:absolute;font-size: 28px;text-align: center;border:2px solid white; border-radius:12px; z-index:40; }
     .hidden { display:none !important; }
     #model-viewer-container { position:absolute; top:0; left:0; width:100%; height:100%; background:transparent; display:flex; align-items:center; justify-content:center; pointer-events:none; z-index:10; }
     #model-viewer-container.hidden { display:none !important; }
     model-viewer { width:100%; height:100%; background:transparent; pointer-events:auto; }
-    .overlay-button { position:absolute; background:rgba(0,0,0,0.5); color:white; border:none; padding:12px; font-size:18px; cursor:pointer; z-index:20; border-radius:4px; pointer-events:auto; }
+    .overlay-button { position:absolute; background:rgba(0,0,0,0.5); color:white; border: 2px solid white; padding:12px; font-size:18px; cursor:pointer; z-index:20; border-radius:4px; pointer-events:auto; }
     #btn-prev  { left:20px; top:50%; transform:translateY(-50%); }
     #btn-next  { right:20px; top:50%; transform:translateY(-50%); }
   </style>
@@ -55,197 +55,272 @@
     <model-viewer id="mv" camera-controls interaction-prompt="none" exposure="1.2" shadow-intensity="1"></model-viewer>
   </div>
 
-<script>
-  const CONTENT = {
-    ubicacion: {
-      audio:'../assets/audios/nazca_ubicacion.mp3',
-      text:'Se ubica en la costa sur del Perú, principalmente en la cuenca del río Grande, en el departamento de Ica.',
-      models: ['../assets/modelos/nazca/mapanazca_3d.glb']
-    },
-    descubridor: {
-      audio:'../assets/audios/nazca_descubridor.mp3',
-      text:'Max Uhle en 1901, Joyce le puso Nazca en 1911.',
-      models: [
-        '../assets/modelos/nazca/descubridor_nazca.glb',
-        '../assets/modelos/nazca/sitio_arqueologico_cahuachi.glb',
-        '../assets/modelos/nazca/mapanazca_3d.glb'
-      ]
-    },
-    sociedad: {
-      audio:'../assets/audios/nazca_sociedad.mp3',
-      video:'../assets/videos/nazca_video.mp4',
-      text:'Teocrático-militar, el poder político emana de una interpretación religiosa...'
-    },
-    economia: {
-      audio:'../assets/audios/nazca_economia.mp3',
-      text:'Su economía giraba en torno a la Agricultura de regadío...'
-    },
-    arquitectura: {
-      audio:'../assets/audios/nazca_arquitectura.mp3',
-      text:'Construyeron con material de adobe y quincha...'
-    },
-    ceramica: {
-      models:[
-        '../assets/modelos/nazca/ceramica/objeto_01_nasca.glb',
-        '../assets/modelos/nazca/ceramica/objeto_02_nasca.glb',
-        '../assets/modelos/nazca/ceramica/objeto_03_nasca.glb'
-      ]
-    },
-    geoglifo: {
-      models:[ '../assets/modelos/nazca/geoglifo/1_el_colibri_lineas_de_nazca.glb' ]
-    }
-  };
+  <script>
+    const CONTENT = {
+      ubicacion: {
+        audio:'../assets/audios/nazca_ubicacion.mp3',
+        text:'La cultura Nazca se desarrolló en Ica, en la cuenca del río Grande, un lugar muy especial del Perú donde hace mucho tiempo vivieron personas muy ingeniosas.',
+        models: ['../assets/modelos/nazca/mapanazca_3d.glb']
+      },
+      descubridor: {
+        audio:'../assets/audios/nazca_descubridor.mp3',
+        text:'Un explorador llamado Max Uhle estudió esta cultura en 1901 y le puso el nombre de "Proto-Nazca", porque fue una de las primeras formas de la cultura Nazca que se conocieron.',
+        models: [
+          '../assets/modelos/nazca/descubridor_nazca.glb',
+        ]
+      },
+      sociedad: {
+        audio:'../assets/audios/nazca_sociedad.mp3',
+        video:'../assets/videos/nazca_sociedad.mp4',
+        text:'En la cultura Nazca, los jefes importantes eran líderes teocrático-militares, es decir, dirigían tanto en las guerras como en las ceremonias religiosas. Desde muy jóvenes, algunos guerreros querían demostrar su valentía. Una forma de hacerlo era consiguiendo las llamadas ‘cabezas trofeo’, que mostraban su fuerza y coraje. Mientras más tuvieran, más respeto recibían en su comunidad. ¡Incluso eso demostraba que ya estaban listos para casarse!',
+      },
+      economia: {
+        audio:'../assets/audios/nazca_economia.mp3',
+        text:'En la cultura Nazca, las personas se dedicaban a la agricultura usando el riego para que sus cultivos crecieran mejor. También pescaban y hacían intercambios con los Huarpa: les daban pescado y algodón, y recibían lana y papas. Fueron muy ingeniosos, porque construyeron acueductos subterráneos, como túneles bajo la tierra, que servían para sacar agua del subsuelo y regar sus campos.',
+        video:'../assets/videos/nazca_economia.mp4',
+        models: ['../assets/modelos/nazca/economia_acueducto_de_cantalloc.glb']
+      },
+      arquitectura: {
+        audio:'../assets/audios/nazca_arquitectura.mp3',
+        text:'En la cultura Nazca, las construcciones se hacían con adobe y quincha, que es una mezcla de caña y barro. Uno de los lugares más importantes fue Cahuachi, que no era una ciudad, sino un gran centro ceremonial. Allí se realizaban rituales y celebraciones. Fue estudiado por un investigador italiano llamado Giuseppe Orefici, quien descubrió que Cahuachi era un lugar sagrado para los Nazca.',
+        models: ['../assets/modelos/nazca/arquitectura_cahuachi.glb']
+      },
+      ceramica: {
+        audio:'../assets/audios/nazca_ceramica.mp3',
+        text:'En la cultura Nazca, la cerámica era muy colorida y detallada. Fue una de las mejores del antiguo Perú. Usaban hasta once colores diferentes y lograron más de 190 tonos distintos. No usaban los colores azul ni verde, porque el mar y el dios Kon eran sagrados para ellos. Sus cerámicas tenían formas redondas, con dos piquitos y un asa en forma de puente. Además, decoraban todos los espacios posibles con dibujos de dioses y figuras. A esto se le llama horror al vacío, porque no les gustaba dejar partes sin pintar.',
+        models:[
+          '../assets/modelos/nazca/ceramica/objeto_01_nasca.glb',
+          '../assets/modelos/nazca/ceramica/objeto_02_nasca.glb',
+          '../assets/modelos/nazca/ceramica/objeto_03_nasca.glb'
+        ]
+      },
+      geoglifo: {
+        audio:'../assets/audios/nazca_geoglifo.mp3',
+        text:'En 1927, Toribio Mejía Xesspe descubrió las líneas de Nazca, aunque no sabía que formaban animales. Pensó que eran caminos usados en ceremonias. Por eso se le conoce como el descubridor científico. En 1941, Paul Kosok sobrevoló la zona y vio figuras de animales. Dijo que era un gran calendario del cielo y lo llamó el calendario astronómico más grande del mundo. María Reiche fue una científica que estudió las líneas por muchos años. Ella creía que muchas estaban alineadas con el sol y las estrellas. Decía que las líneas ayudaban a saber cuándo comenzaban las estaciones del año. Por ejemplo, los solsticios son los días más largos o más cortos del año, y los equinoccios son cuando el día y la noche duran lo mismo. Según María Reiche, las líneas servían para predecir el clima y saber cuándo sembrar o cosechar.',
+        video:'../assets/videos/nazca_video.mp4',
+        models:[ '../assets/modelos/nazca/geoglifo/1_el_colibri_lineas_de_nazca.glb','../assets/modelos/nazca/geoglifo/2_the_astronaut_geoglyph_in_nazca_peru.glb', '../assets/modelos/nazca/geoglifo/3_nazca_lines_tree_and_hands_peru.glb', '../assets/modelos/nazca/geoglifo/4_nazca_lines_spider_peru.glb']
+      }
+    };
 
-  const panel = document.getElementById('hud-panel');
-  const mvContainer = document.getElementById('model-viewer-container');
-  const mv = document.getElementById('mv');
-  const btnPrev = document.getElementById('btn-prev');
-  const btnNext = document.getElementById('btn-next');
-  let currentAudio, currentVideo;
-  let models = [], idx = 0;
-  let lastRegion = null;
+    const panel = document.getElementById('hud-panel');
+    const mvContainer = document.getElementById('model-viewer-container');
+    const mv = document.getElementById('mv');
+    const btnPrev = document.getElementById('btn-prev');
+    const btnNext = document.getElementById('btn-next');
+    let currentAudio, currentVideo;
+    let models = [], idx = 0;
+    let lastRegion = null;
+    let isMinimized = false;
+    const originalHeight = '250px';
 
-  function showText(key) {
-    panel.innerHTML = '';
-    panel.classList.remove('hidden');
-    if (currentAudio) { currentAudio.pause(); currentAudio.currentTime = 0; }
-    if (currentVideo) { currentVideo.pause(); currentVideo.remove(); currentVideo = null; }
-
-    const info = CONTENT[key];
-
-    if (info.models) {
-      models = info.models;
-      idx = 0;
-      mv.src = models[0];
-      mvContainer.classList.remove('hidden');
-    } else {
-      mvContainer.classList.add('hidden');
-    }
-
-    const contentWrapper = document.createElement('div');
-    contentWrapper.id = 'panel-content';
-
-    const close = document.createElement('button');
-    close.textContent = '✖';
-    Object.assign(close.style, {
-      position: 'absolute', top: '5px', right: '5px', background: 'none',
-      border: 'none', color: 'white', fontSize: '24px', cursor: 'pointer'
-    });
-    close.onclick = () => {
-      panel.classList.add('hidden');
-      mvContainer.classList.add('hidden');
+    function showText(key) {
+      panel.innerHTML = '';
+      panel.classList.remove('hidden');
       if (currentAudio) { currentAudio.pause(); currentAudio.currentTime = 0; }
       if (currentVideo) { currentVideo.pause(); currentVideo.remove(); currentVideo = null; }
-    };
-    panel.appendChild(close);
 
-    if (info.audio) {
-      currentAudio = new Audio(info.audio);
-      ['▶','⏸','⏹'].forEach(sym => {
-        const b = document.createElement('button');
-        b.textContent = sym;
-        b.style.margin = '0 8px';
-        b.onclick = {
-          '▶': () => currentAudio.play(),
-          '⏸': () => currentAudio.pause(),
-          '⏹': () => { currentAudio.pause(); currentAudio.currentTime = 0; }
-        }[sym];
-        contentWrapper.appendChild(b);
-      });
-    }
+      const info = CONTENT[key];
 
-    if (info.text) {
-      const btnText = document.createElement('button');
-      btnText.textContent = '📖';
-      btnText.style.margin = '0 8px';
-      btnText.onclick = () => {
-        if (currentVideo) { currentVideo.pause(); currentVideo.remove(); currentVideo = null; }
-        const prevText = document.getElementById('text-block');
-        if (prevText) prevText.remove();
-        const p = document.createElement('p');
-        p.id = 'text-block';
-        p.style.marginTop = '10px';
-        p.textContent = info.text;
-        contentWrapper.appendChild(p);
+      // Manejo de modelos
+      if (info.models) {
+        models = info.models;
+        idx = 0;
+        mv.src = models[0];
+        mvContainer.classList.remove('hidden');
+      } else {
+        mvContainer.classList.add('hidden');
+      }
+
+      const contentWrapper = document.createElement('div');
+      contentWrapper.id = 'panel-content';
+      contentWrapper.style.display = isMinimized ? 'none' : 'block';
+
+      const topBarRow1 = document.createElement('div');
+      topBarRow1.style.cssText = 'display:flex;justify-content:flex-end;gap:5px;background:rgba(0,0,0,0.8);padding:2px 6px;position:sticky;top:0;z-index:2; border-radius:12px;';
+
+      const topBarRow2 = document.createElement('div');
+      topBarRow2.style.cssText = 'display:flex;justify-content:center;gap:10px;background:rgba(0,0,0,0.95);padding:4px;flex-wrap:wrap;position:sticky;top:40px;z-index:2;border:1px solid white; border-radius:12px;';
+
+
+      const mediaControls = document.createElement('div');
+      mediaControls.style.display = 'flex';
+      mediaControls.style.gap = '8px';
+
+      const windowControls = document.createElement('div');
+      windowControls.style.display = 'flex';
+      windowControls.style.gap = '5px';
+
+      const btnMin = document.createElement('button');
+      btnMin.textContent = '−';
+      Object.assign(btnMin.style, { background:'none', border:'none', color:'white', fontSize:'24px', cursor:'pointer', transform:'scale(0.85)' });
+      btnMin.onclick = () => {
+        panel.style.height = '100px';
+        panel.style.overflow = 'hidden';
+        contentWrapper.style.display = 'none';
+        isMinimized = true;
       };
-      contentWrapper.appendChild(btnText);
-    }
 
-    if (info.video) {
-      const btnVideo = document.createElement('button');
-      btnVideo.textContent = '📹';
-      btnVideo.style.margin = '0 8px';
-      btnVideo.onclick = () => {
+      const btnRestore = document.createElement('button');
+      btnRestore.textContent = '▢';
+      Object.assign(btnRestore.style, { background:'none', border:'none', color:'white', fontSize:'20px', cursor:'pointer', transform:'scale(0.85)' });
+      btnRestore.onclick = () => {
+        panel.style.height = originalHeight;
+        panel.style.overflow = 'auto';
+        contentWrapper.style.display = 'block';
+        isMinimized = false;
+      };
+
+      const btnClose = document.createElement('button');
+      btnClose.textContent = '✖';
+      Object.assign(btnClose.style, { background:'none', border:'none', color:'white', fontSize:'24px', cursor:'pointer', transform:'scale(0.85)' });
+      btnClose.onclick = () => {
+        panel.classList.add('hidden');
+        mvContainer.classList.add('hidden');
         if (currentAudio) { currentAudio.pause(); currentAudio.currentTime = 0; }
-        if (currentVideo) { currentVideo.pause(); currentVideo.remove(); }
-        const prevText = document.getElementById('text-block');
-        if (prevText) prevText.remove();
-        currentVideo = document.createElement('video');
-        currentVideo.src = info.video;
-        currentVideo.controls = true;
-        currentVideo.autoplay = true;
-        currentVideo.style.width = '100%';
-        currentVideo.style.marginTop = '10px';
-        contentWrapper.appendChild(currentVideo);
+        if (currentVideo) { currentVideo.pause(); currentVideo.remove(); currentVideo = null; }
       };
-      contentWrapper.appendChild(btnVideo);
+
+      windowControls.appendChild(btnMin);
+      windowControls.appendChild(btnRestore);
+      windowControls.appendChild(btnClose);
+      topBarRow1.appendChild(windowControls);
+      topBarRow2.appendChild(mediaControls);
+
+      // AUDIO
+      if (info.audio) {
+        currentAudio = new Audio(info.audio);
+        ['▶','⏸','⏹'].forEach(sym => {
+          const b = document.createElement('button');
+          b.textContent = sym;
+          b.onclick = {
+            '▶': () => currentAudio.play(),
+            '⏸': () => currentAudio.pause(),
+            '⏹': () => { currentAudio.pause(); currentAudio.currentTime = 0; }
+          }[sym];
+          mediaControls.appendChild(b);
+        });
+      }
+
+      // TEXTO
+      if (info.text) {
+        const btnText = document.createElement('button');
+        btnText.textContent = '📖';
+        btnText.onclick = () => {
+          if (currentVideo) { currentVideo.pause(); currentVideo.remove(); currentVideo = null; }
+          const prev = document.getElementById('text-block');
+          if (prev) prev.remove();
+          const p = document.createElement('p');
+          p.id = 'text-block';
+          p.style.marginTop = '10px';
+          p.textContent = info.text;
+          contentWrapper.appendChild(p);
+        };
+        mediaControls.appendChild(btnText);
+      }
+
+      // VIDEO
+      if (info.video) {
+        const btnVideo = document.createElement('button');
+        btnVideo.textContent = '📹';
+        btnVideo.style.transform = 'scale(0.9)';
+        btnVideo.onclick = () => {
+          if (currentAudio) { currentAudio.pause(); currentAudio.currentTime = 0; }
+          if (currentVideo) { currentVideo.pause(); currentVideo.remove(); }
+          const prev = document.getElementById('text-block');
+          if (prev) prev.remove();
+          currentVideo = document.createElement('video');
+          currentVideo.src = info.video;
+          currentVideo.controls = true;
+          currentVideo.autoplay = true;
+          currentVideo.style.width = '100%';
+          currentVideo.style.marginTop = '10px';
+          contentWrapper.appendChild(currentVideo);
+        };
+        mediaControls.appendChild(btnVideo);
+      }
+
+      panel.appendChild(topBarRow1);
+      panel.appendChild(topBarRow2);
+      panel.appendChild(contentWrapper);
     }
 
-    panel.appendChild(contentWrapper);
-  }
+    function openViewer(key) {
+      const info = CONTENT[key];
+      if (info.audio || info.text || info.video) showText(key);
+      else panel.classList.add('hidden');
+      if (info.models) {
+        models = info.models;
+        idx = 0;
+        mv.src = models[0];
+        mvContainer.classList.remove('hidden');
+      } else {
+        mvContainer.classList.add('hidden');
+      }
+    }
 
-  function openViewer(key) {
-    panel.classList.add('hidden');
-    if (currentAudio) { currentAudio.pause(); currentAudio.currentTime = 0; }
-    if (currentVideo) { currentVideo.pause(); currentVideo.remove(); currentVideo = null; }
-    models = CONTENT[key].models;
-    idx = 0;
-    mv.src = models[0];
-    mvContainer.classList.remove('hidden');
-  }
+    btnPrev.onclick = () => {
+      idx = (idx - 1 + models.length) % models.length;
+      mv.src = models[idx];
+    };
+    btnNext.onclick = () => {
+      idx = (idx + 1) % models.length;
+      mv.src = models[idx];
+    };
 
-  btnPrev.onclick = () => {
-    idx = (idx - 1 + models.length) % models.length;
-    mv.src = models[idx];
-  };
-  btnNext.onclick = () => {
-    idx = (idx + 1) % models.length;
-    mv.src = models[idx];
-  };
-
-  document.querySelectorAll('.hud-menu button').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const key = btn.dataset.key;
-      if (key === 'ceramica' || key === 'geoglifo') openViewer(key);
-      else showText(key);
+    document.querySelectorAll('.hud-menu button').forEach(btn => {
+      btn.onclick = () => openViewer(btn.dataset.key);
     });
-  });
 
-  const marker = document.querySelector('a-marker');
-  const front = document.getElementById('menu-front');
-  const left  = document.getElementById('menu-left');
-  const right = document.getElementById('menu-right');
+    const marker = document.querySelector('#hiro-marker');
+    const front = document.getElementById('menu-front');
+    const left  = document.getElementById('menu-left');
+    const right = document.getElementById('menu-right');
 
-  function updateMenus() {
-    const y = THREE.Math.radToDeg(marker.object3D.rotation.y);
-    let region = 'front';
-    if (y > 45 && y < 135) region = 'left';
-    else if (y < -45 && y > -135) region = 'right';
-    if (lastRegion !== null && region !== lastRegion) {
-      if (!panel.classList.contains('hidden')) panel.classList.add('hidden');
-      if (!mvContainer.classList.contains('hidden')) mvContainer.classList.add('hidden');
+    function updateMenus() {
+      const y = THREE.Math.radToDeg(marker.object3D.rotation.y);
+      let region = 'front';
+      if (y > 45 && y < 135) region = 'left';
+      else if (y < -45 && y > -135) region = 'right';
+      if (lastRegion !== null && region !== lastRegion) {
+        panel.classList.add('hidden');
+        mvContainer.classList.add('hidden');
+      }
+      lastRegion = region;
+      front.classList.toggle('hidden', region !== 'front');
+      left.classList.toggle('hidden', region !== 'left');
+      right.classList.toggle('hidden', region !== 'right');
     }
-    lastRegion = region;
-    front.classList.toggle('hidden', region !== 'front');
-    left.classList.toggle('hidden', region !== 'left');
-    right.classList.toggle('hidden', region !== 'right');
-  }
 
-  (function tick() {
-    if (marker.object3D) updateMenus();
-    requestAnimationFrame(tick);
-  })();
-</script>
+    (function tick() {
+      if (marker.object3D) updateMenus();
+      requestAnimationFrame(tick);
+    })();
+
+    window.addEventListener('DOMContentLoaded', () => {
+      const introAudio = document.getElementById('intro-audio');
+
+      // Algunos navegadores bloquean el autoplay sin interacción
+      // Aquí intentamos reproducirlo apenas se cargue
+      if (introAudio) {
+        introAudio.play().catch(() => {
+          // Si falla, se espera a que el usuario haga clic en algún botón del HUD
+          document.body.addEventListener('click', () => {
+            introAudio.play();
+          }, { once: true });
+        });
+      }
+    });
+
+    // Manejo de eventos para el botón de retroceso
+    document.getElementById('hud-back').addEventListener('click', () => {
+      if (currentAudio) { currentAudio.pause(); currentAudio.currentTime = 0; }
+      if (currentVideo) { currentVideo.pause(); currentVideo.remove(); currentVideo = null; }
+      panel.classList.add('hidden');
+      mvContainer.classList.add('hidden');
+    });
+
+  </script>
+  <audio id="intro-audio" src="../assets/audios/intro_nazca.mp3" autoplay></audio>
 
 </body>
 </html>
