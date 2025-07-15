@@ -1,52 +1,410 @@
-
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="utf-8">
-    <title>Cultura Chavín</title>
-    <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
-  </head>
-  <body>
-    <a-scene>
-      <a-assets>
-        <a-asset-item id="modeloCeramica" src="../assets/modelos/ceramica_chavin.glb"></a-asset-item>
-        <img id="descubridor" src="../assets/imagenes/descubridor_chavin.jpg">
-        <audio id="audioExplicativo" src="../assets/audios/chavin_audio.mp3"></audio>
-        <video id="videoCultura" src="../assets/videos/chavin_video.mp4" crossorigin="anonymous"></video>
-        <track kind="subtitles" src="../assets/subtitulos/chavin_sub.vtt" srclang="es" label="Español" default></track>
-      </a-assets>
+<head>
+  <meta charset="utf-8" />
+  <title>CHAVÍN</title>
 
-      <a-entity gltf-model="#modeloCeramica" position="0 1.2 -3" scale="1 1 1" rotation="0 180 0"></a-entity>
+  <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
+  <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
 
-      <a-image src="#descubridor" position="-1.5 1 -2" width="1.5" height="1.2"></a-image>
+  <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
 
-      <a-sound src="#audioExplicativo" autoplay="false" on="click"></a-sound>
+  <script type="text/javascript" src="https://static.sketchfab.com/api/sketchfab-viewer-1.12.1.js"></script>
 
-      <a-video src="#videoCultura" width="3" height="1.5" position="1.5 1 -2" autoplay="false">
-        <track kind="subtitles" src="../assets/subtitulos/chavin_sub.vtt" srclang="es" label="Español" default></track>
-      </a-video>
+  <style>
+    html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;}
+    a-scene{position:absolute;top:0;left:0;width:100%;height:100%;}
 
-      <!-- Botón para reproducir audio -->
-      <a-plane position="-1.5 0.3 -2" width="0.8" height="0.3" color="#FF5722" class="clickable"
-               onclick="document.querySelector('#audioExplicativo').components.sound.playSound()">
-        <a-text value="Escuchar audio" align="center" position="0 0 0.01" color="white"></a-text>
-      </a-plane>
+    /* HUD ------------------------------------------------------------- */
+    .hud-ui{
+      position:absolute;
+      left:0;
+      right:0;
+      pointer-events: auto; /* Permite que los elementos del HUD reciban eventos de puntero */
+      z-index: 200; /* Asegura que el HUD esté por encima de la escena AR y el contenedor de modelos */
+    }
+    #hud-header{top:0;height:50px;background:rgba(0,0,0,.9);color:#fff;
+                 text-align:center;line-height:50px;font-size:40px;}
+    #hud-back{bottom:15px;left:50%;transform:translateX(-50%);
+              background:#4caf50;color:#fff;padding:12px 16px;font-size:18px;
+              border:2px solid #fff;border-radius:12px;cursor:pointer;}
+    .hud-menu{top:60px;display:flex;gap:10px;justify-content:center;}
+    .hud-menu button{background:#4caf50;color:#fff;padding:12px 16px;font-size:18px;
+                     border:2px solid #fff;border-radius:12px;cursor:pointer;}
+    #hud-panel{bottom:70px;left:50%;transform:translateX(-50%);
+                width:90%;max-width:400px;height:250px;background:rgba(0,0,0,.9);
+                color:#fff;padding:10px;box-sizing:border-box;overflow:auto;
+                position:absolute;font-size:28px;text-align:center;
+                border:2px solid #fff;border-radius:12px;
+                /* Crucial: el panel HUD debe estar encima y capturar eventos */
+                z-index:210; /* Mayor que #ar-content-viewer para que HUD tenga prioridad */
+                pointer-events: auto; /* Asegura que el panel capture los eventos */
+            }
+    .hidden{display:none!important;}
 
-      <!-- Botón para reproducir video -->
-      <a-plane position="1.5 0.3 -2" width="0.8" height="0.3" color="#3F51B5" class="clickable"
-               onclick="document.querySelector('#videoCultura').play()">
-        <a-text value="Ver video" align="center" position="0 0 0.01" color="white"></a-text>
-      </a-plane>
+    /* Contenedor principal para los visores 3D (Model Viewer y Sketchfab) */
+    #ar-content-viewer {
+        position:absolute;
+        top:0;
+        left:0;
+        width:100%;
+        height:100%;
+        display:flex; /* Para centrar los modelos */
+        align-items:center;
+        justify-content:center;
+        /* Por defecto, no permite interacción, JS lo activará o desactivará */
+        pointer-events: none;
+        z-index: 100; /* Estará encima de la escena AR (z-index por defecto de A-Frame es 0/1) pero debajo del HUD */
+    }
+    #ar-content-viewer.hidden{display:none!important;}
 
-      <!-- Botón para regresar -->
-      <a-plane position="0 0.3 -1" width="1" height="0.3" color="#009688" class="clickable"
-               onclick="location.href='../index.html'">
-        <a-text value="Regresar al mapa" align="center" position="0 0 0.01" color="white"></a-text>
-      </a-plane>
+    /* visor .glb ------------------------------------------------------- */
+    #model-viewer-container{
+      width:100%;
+      height:100%;
+      display:none; /* Oculto por defecto dentro de ar-content-viewer */
+      align-items:center;
+      justify-content:center;
+      pointer-events: auto; /* model-viewer necesita esto para su propio canvas */
+    }
+    #model-viewer-container.active { display:flex; } /* Clase para activarlo */
 
-      <a-entity camera>
-        <a-cursor raycaster="objects: .clickable"></a-cursor>
-      </a-entity>
-    </a-scene>
-  </body>
+    model-viewer{width:100%;height:100%;} /* Ya está dentro de un contenedor con pointer-events:auto */
+
+    .overlay-button{position:absolute;background:rgba(0,0,0,.5);color:#fff;
+                    border:2px solid #fff;padding:12px;font-size:18px;cursor:pointer;
+                    border-radius:4px;pointer-events:auto;z-index:101;} /* Ligeramente superior al #ar-content-viewer */
+    #btn-prev{left:20px;top:50%;transform:translateY(-50%);}
+    #btn-next{right:20px;top:50%;transform:translateY(-50%);}
+
+    /* Sketchfab -------------------------------------------------------- */
+    #api-frame{
+      width:80%;
+      height:40%;
+
+      position:absolute;
+      top:118px;               /* 118 px desde el borde superior */
+      left:50%;
+      transform:translateX(-50%); /* solo centrado horizontal */
+
+      border:none;
+      display:none;
+      pointer-events:auto;      /* mantiene interacción */
+    }
+
+    #api-frame.active { display:block; } /* Clase para activarlo */
+
+    /* loader ----------------------------------------------------------- */
+    #loader{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);
+            background:rgba(0,0,0,.85);color:#fff;padding:12px 24px;font-size:22px;
+            border:2px solid #fff;border-radius:12px;z-index:190;pointer-events:none;}
+  </style>
+</head>
+<body>
+  <a-scene vr-mode-ui="enabled:false" loading-screen="enabled:false"
+           arjs="sourceType:webcam;debugUIEnabled:false">
+    <a-marker preset="hiro" id="hiro-marker"></a-marker>
+    <a-entity camera></a-entity>
+  </a-scene>
+
+  <div id="hud-header" class="hud-ui">CHAVÍN</div>
+  <div id="hud-back" class="hud-ui" onclick="location.href='../index.html'">← IR AL MAPA</div>
+
+  <div id="menu-front" class="hud-ui hud-menu">
+    <button data-key="ubicacion">Ubicación</button>
+    <button data-key="descubridor">Descubridor</button>
+    <button data-key="sociedad">Sociedad</button>
+  </div>
+  <div id="menu-left"  class="hud-ui hud-menu hidden">
+    <button data-key="economia">Economía</button>
+    <button data-key="arquitectura">Arquitectura</button>
+  </div>
+  <div id="menu-right" class="hud-ui hud-menu hidden">
+    <button data-key="ceramica">Cerámica&nbsp;(3D)</button>
+    <button data-key="geoglifo">Geoglifos&nbsp;(3D)</button>
+  </div>
+
+  <div id="hud-panel" class="hud-ui hidden"></div>
+
+  <div id="ar-content-viewer">
+    <div id="model-viewer-container">
+      <button id="btn-prev" class="overlay-button">◀</button>
+      <button id="btn-next" class="overlay-button">▶</button>
+      <model-viewer id="mv" camera-controls interaction-prompt="none"
+                    exposure="1.2" shadow-intensity="1"></model-viewer>
+    </div>
+
+    <iframe id="api-frame" src=""
+            sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
+            allow="autoplay; fullscreen; xr-spatial-tracking">
+    </iframe>
+  </div>
+
+  <div id="loader">Cargando…</div>
+
+  <audio src="../assets/audios/intro_chavin.mp3" autoplay></audio>
+
+  <script>
+  /* ---------- datos ---------- */
+  const CONTENT={
+    ubicacion:{audio:'../assets/audios/chavin_ubicacion.mp3',
+              text :'En la cultura Chavín, su centro más importante fue Chavín de Huántar…',
+              embedUid:'cabb014de0564b559cbe7ba084c56b16'},
+    descubridor:{audio:'../assets/audios/nazca_descubridor.mp3',
+                  text :'Un explorador llamado Max Uhle…',
+                  models:['../assets/modelos/nazca/descubridor_nazca.glb']},
+    sociedad:{audio:'../assets/audios/nazca_sociedad.mp3',
+              video:'../assets/videos/nazca_sociedad.mp4',
+              text :'En la cultura Nazca, los jefes importantes…'},
+    economia:{audio:'../assets/audios/nazca_economia.mp3',
+              video:'../assets/videos/nazca_economia.mp4',
+              text :'En la cultura Nazca, las personas se dedicaban…',
+              models:['../assets/modelos/nazca/economia_acueducto_de_cantalloc.glb']},
+    arquitectura:{audio:'../assets/audios/nazca_arquitectura.mp3',
+                  text :'En la cultura Nazca, las construcciones se hacían…',
+                  models:['../assets/modelos/nazca/arquitectura_cahuachi.glb']},
+    ceramica:{audio:'../assets/audios/nazca_ceramica.mp3',
+              text :'La cerámica era muy colorida…',
+              models:['../assets/modelos/nazca/ceramica/objeto_01_nasca.glb',
+                      '../assets/modelos/nazca/ceramica/objeto_02_nasca.glb',
+                      '../assets/modelos/nazca/ceramica/objeto_03_nasca.glb']},
+    geoglifo:{audio:'../assets/audios/nazca_geoglifo.mp3',
+              text :'En 1927, Toribio Mejía Xesspe descubrió…',
+              video:'../assets/videos/nazca_video.mp4',
+              models:['../assets/modelos/nazca/geoglifo/1_el_colibri_lineas_de_nazca.glb',
+                      '../assets/modelos/nazca/geoglifo/2_the_astronaut_geoglyph_in_nazca_peru.glb',
+                      '../assets/modelos/nazca/geoglifo/3_nazca_lines_tree_and_hands_peru.glb',
+                      '../assets/modelos/nazca/geoglifo/4_nazca_lines_spider_peru.glb']}
+  };
+
+  /* ---------- refs & estado ---------- */
+  const panel             = document.getElementById('hud-panel');
+  const arContentViewer   = document.getElementById('ar-content-viewer'); // Nuevo contenedor
+  const mvCont            = document.getElementById('model-viewer-container');
+  const mv                = document.getElementById('mv');
+  const btnPrev           = document.getElementById('btn-prev');
+  const btnNext           = document.getElementById('btn-next');
+  const apiFrame          = document.getElementById('api-frame');
+  const loader            = document.getElementById('loader');
+
+  let currentAudio=null;
+  let models=[],idx=0,lastRegion=null;
+  let skfbApi=null,skfbReady=false;
+
+  /* ---------- helper para (re)dibujar controles ---------- */
+  function renderHud(info){
+    document.getElementById('panel-content')?.remove();    // limpia
+
+    const wrapper=document.createElement('div');
+    wrapper.id='panel-content';
+
+    /* barra superior (ventana) */
+    const bar1=document.createElement('div');
+    bar1.style.cssText='position:sticky;top:0;display:flex;justify-content:flex-end;gap:5px;'
+      +'padding:2px 6px;background:rgba(0,0,0,.8);border-radius:12px;';
+    ['−','▢','✖'].forEach(sym=>{
+      const b=document.createElement('button'); b.textContent=sym;
+      Object.assign(b.style,{background:'none',border:'none',color:'#fff',fontSize:'24px',cursor:'pointer'});
+      b.onclick={
+        '−':()=>{
+            panel.style.height='100px';
+            panel.style.overflow='hidden';
+            wrapper.style.display='none';
+            // Al minimizar el panel, permitir interacción con el modelo si está activo
+            if (!arContentViewer.classList.contains('hidden')) {
+                arContentViewer.style.pointerEvents = 'auto';
+            }
+        },
+        '▢':()=>{
+            panel.style.height='250px';
+            panel.style.overflow='auto';
+            wrapper.style.display='block';
+            // Al restaurar el panel, asegurar que solo el panel capture los clics
+            arContentViewer.style.pointerEvents = 'none';
+        },
+        '✖':()=>{
+            panel.classList.add('hidden');
+            // Al cerrar el panel, el contenedor de contenido AR debe estar visible y ser interactuable
+            arContentViewer.classList.remove('hidden'); // Asegura que el contenedor esté visible
+            arContentViewer.style.pointerEvents = 'auto'; // Asegura que el contenedor sea interactuable
+
+            // Oculta los visores específicos dentro del contenedor si es necesario
+            mvCont.classList.remove('active'); // Oculta .glb
+            apiFrame.classList.remove('active'); // Oculta Sketchfab
+
+            if(skfbApi)skfbApi.pause(); // Pausa Sketchfab si está activo
+        }
+      }[sym];
+      bar1.appendChild(b);
+    });
+
+    /* barra de controles */
+    const bar2=document.createElement('div');
+    bar2.style.cssText='position:sticky;top:40px;display:flex;justify-content:center;gap:10px;'
+      +'padding:4px;background:rgba(0,0,0,.95);border:1px solid #fff;border-radius:12px;flex-wrap:wrap;';
+
+    /* audio */
+    if(info.audio){
+      if(currentAudio){currentAudio.pause();currentAudio.currentTime=0;}
+      currentAudio=new Audio(info.audio);
+      ['▶','⏸','⏹'].forEach(sym=>{
+        const b=document.createElement('button'); b.textContent=sym;
+        Object.assign(b.style,{background:'none',border:'none',color:'#fff',fontSize:'26px'});
+        b.onclick={'▶':()=>currentAudio.play(),
+                    '⏸':()=>currentAudio.pause(),
+                    '⏹':()=>{currentAudio.pause();currentAudio.currentTime=0;}}[sym];
+        bar2.appendChild(b);
+      });
+    }
+
+    /* texto */
+    if(info.text){
+      const bt=document.createElement('button'); bt.textContent='📖';
+      Object.assign(bt.style,{background:'none',border:'none',color:'#fff',fontSize:'26px'});
+      bt.onclick=()=>{
+        document.getElementById('text-block')?.remove();
+        const p=document.createElement('p');
+        p.id='text-block'; p.style.marginTop='10px'; p.textContent=info.text;
+        wrapper.appendChild(p);
+      };
+      bar2.appendChild(bt);
+    }
+
+    /* video */
+    if(info.video){
+      const bv=document.createElement('button'); bv.textContent='📹';
+      Object.assign(bv.style,{background:'none',border:'none',color:'#fff',fontSize:'26px'});
+      bv.onclick=()=>{
+        document.getElementById('text-block')?.remove();
+        document.getElementById('cur-video')?.remove();
+        const v=document.createElement('video');
+        v.id='cur-video'; v.src=info.video; v.controls=true; v.autoplay=true;
+        v.style.width='100%'; v.style.marginTop='10px';
+        wrapper.appendChild(v);
+      };
+      bar2.appendChild(bv);
+    }
+
+    panel.appendChild(bar1);
+    panel.appendChild(bar2);
+    panel.appendChild(wrapper);
+    panel.scrollTop=0;
+  }
+
+  /* ---------- precarga Sketchfab ---------- */
+  document.addEventListener('DOMContentLoaded',()=>{
+    const client=new Sketchfab(apiFrame);
+    client.init(CONTENT.ubicacion.embedUid,{
+      autostart:0,ui_controls:0,ui_watermark_link:0,
+      success(api){
+        skfbApi=api;
+        api.addEventListener('viewerready',()=>{
+          skfbReady=true;
+          loader.style.display='none';
+          api.pause();
+          // Por defecto, al precargar, Sketchfab está oculto y no interactuable
+          apiFrame.classList.remove('active'); // Asegurarse de que no esté activo inicialmente
+          arContentViewer.classList.add('hidden'); // Ocultar el contenedor de contenido AR
+          arContentViewer.style.pointerEvents = 'none'; // Desactivar interacción
+        });
+        api.start();
+      },
+      error(){console.error('❌ Error precargando Sketchfab');}
+    });
+  });
+
+  /* ---------- función principal ---------- */
+  function showText(key){
+    const info=CONTENT[key];
+
+    panel.innerHTML='';
+    panel.classList.remove('hidden'); // Muestra el panel
+    panel.scrollTop=0;
+
+    if(currentAudio){currentAudio.pause();currentAudio.currentTime=0;}
+    document.getElementById('cur-video')?.remove();
+
+    // Resetear y ocultar todos los visores 3D dentro del contenedor principal
+    mvCont.classList.remove('active');
+    apiFrame.classList.remove('active');
+    if(skfbApi) skfbApi.pause();
+
+    // Asegura que el panel HUD capture los clics
+    panel.style.pointerEvents = 'auto';
+    panel.style.zIndex = '210';
+
+    // Deshabilita la interacción con el contenedor de contenido AR mientras el panel está activo
+    arContentViewer.style.pointerEvents = 'none';
+    arContentViewer.classList.remove('hidden'); // Asegura que el contenedor esté visible para mostrar el modelo
+                                                // (pero no interactuable si el panel está encima)
+
+
+    /* crea controles inmediatamente */
+    renderHud(info);
+
+    /* visor 3D */
+    if(info.models){                        // .glb
+      models=info.models; idx=0; mv.src=models[0];
+      mvCont.classList.add('active'); // Activa el model-viewer específico
+    }else if(info.embedUid){                // Sketchfab
+      apiFrame.classList.add('active'); // Activa el iframe de Sketchfab específico
+      if(skfbReady){
+        skfbApi.play(); skfbApi.resize();
+      }
+      /* vuelve a pintar HUD tras viewerready definitivo */
+      const once=()=>{renderHud(info); skfbApi.removeEventListener('viewerready',once);};
+      skfbApi.addEventListener('viewerready',once);
+    }
+  }
+
+  /* navegación modelos .glb */
+  btnPrev.onclick=()=>{if(!models.length)return;idx=(idx-1+models.length)%models.length;mv.src=models[idx];};
+  btnNext.onclick=()=>{if(!models.length)return;idx=(idx+1)%models.length;mv.src=models[idx];};
+
+  /* botones HUD */
+  document.querySelectorAll('.hud-menu button').forEach(btn=>btn.onclick=(e)=>{
+    showText(e.target.dataset.key);
+  });
+
+  /* menús por rotación */
+  const marker = document.querySelector('#hiro-marker');
+  const front  = document.getElementById('menu-front');
+  const left   = document.getElementById('menu-left');
+  const right  = document.getElementById('menu-right');
+
+  function updateMenus(){
+    const y=THREE.Math.radToDeg(marker.object3D.rotation.y);
+    let region='front'; if(y>45&&y<135)region='left'; else if(y<-45&&y>-135)region='right';
+
+    if(region!==lastRegion){
+      panel.classList.add('hidden'); // Oculta el panel
+      panel.style.pointerEvents = 'none'; // Desactiva los eventos del panel cuando está oculto
+
+      // Cuando se cambia de región, ocultar los modelos y desactivar interacción del contenedor de modelos
+      mvCont.classList.remove('active');
+      apiFrame.classList.remove('active');
+      arContentViewer.classList.add('hidden'); // Oculta el contenedor de modelos
+      arContentViewer.style.pointerEvents = 'none'; // Desactiva interacción
+
+      if(skfbApi)skfbApi.pause();
+    }
+    lastRegion=region;
+    front.classList.toggle('hidden',region!=='front');
+    left .classList.toggle('hidden',region!=='left');
+    right.classList.toggle('hidden',region!=='right');
+
+    // Lógica para activar/desactivar la interacción del contenedor de modelos
+    // Si el panel está oculto Y (hay un modelo GLB activo O hay un Sketchfab activo)
+    const isModelViewerActive = !mvCont.classList.contains('hidden') && mvCont.classList.contains('active');
+    const isSketchfabActive = !apiFrame.classList.contains('hidden') && apiFrame.classList.contains('active');
+
+    if (panel.classList.contains('hidden') && (isModelViewerActive || isSketchfabActive)) {
+        arContentViewer.style.pointerEvents = 'auto'; // Permite interacción con el contenedor de modelos
+    } else {
+        arContentViewer.style.pointerEvents = 'none'; // Desactiva interacción (HUD activo o no hay modelo)
+    }
+  }
+  (function tick(){if(marker.object3D)updateMenus();requestAnimationFrame(tick);})();
+  </script>
+</body>
 </html>
