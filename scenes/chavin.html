@@ -155,15 +155,16 @@
                         text :'El descubridor de la cultura Chavín fue el arqueólogo y médico peruano Julio C. Tello. Él estudió el templo de Chavín de Huántar y dijo que era una de las culturas más antiguas del Perú. Pero mucho antes, en 1548, el cronista Pedro Cieza de León ya había visto el templo. Y en 1620, otro español, Antonio Vásquez de Espinoza, lo visitó y dijo que era tan impresionante que parecía hecho por gigantes. Gracias a Julio C. Tello y a los estudios posteriores, hoy conocemos mucho más sobre esta increíble cultura',
                         models:['../assets/modelos/chavin/descubridor_chavin.glb']},
         sociedad:{audio:'../assets/audios/chavin_sociedad.mp3',
-                    video:'../assets/videos/chavin_sociedad.mp4',
-                    text :'En la cultura Chavín, la sociedad era teocrática, es decir, gobernada por sacerdotes que decían tener conexión con los dioses. Ellos tenían mucho poder porque conocían el cielo, el clima y los ciclos agrícolas. Gracias a ese conocimiento, podían predecir lluvias o cosechas, lo que hacía que la población confiara en ellos y les ofreciera tributos en forma de alimentos'},
+                    
+                    text :'En la cultura Chavín, la sociedad era teocrática, es decir, gobernada por sacerdotes que decían tener conexión con los dioses. Ellos tenían mucho poder porque conocían el cielo, el clima y los ciclos agrícolas. Gracias a ese conocimiento, podían predecir lluvias o cosechas, lo que hacía que la población confiara en ellos y les ofreciera tributos en forma de alimentos',
+                    models:['../assets/modelos/chavin/sociedad_chavin.glb']},
         economia:{audio:'../assets/audios/chavin_economia.mp3',
                     video:'../assets/videos/chavin_economia.mp4',
                     text :'En la cultura Chavín, la economía se basaba en la agricultura y la ganadería.  Uno de sus cultivos más importantes fue el maíz.',
                     models:['../assets/modelos/chavin/economia_chavin.glb']},
         arquitectura:{audio:'../assets/audios/chavin_arquitectura.mp3',
                         text :'En la cultura Chavín, usaban adobe en la costa y piedra en la sierra para construir. Hacían pirámides truncas, templos en forma de herradura o de U, plazas circulares y cuadradas hundidas, y túneles subterráneos que representaban el mundo de abajo, llamado Uku Pacha. Los templos cumplían tres funciones: control social, astronómica y religiosa.',
-                        embedUid:'a0fbb78a90704f77974ad03428a3d704'},
+                        embedUid:'cabb014de0564b559cbe7ba084c56b16'},
         escultura:{audio:'../assets/audios/chavin_escultura.mp3',
                     text :'En la cultura Chavín, sus esculturas eran de piedra y representaban dioses con formas poderosas y misteriosas. Usaban animales como el felino, el ave, la serpiente y el caimán, que eran símbolos de fuerza y respeto. Una de las esculturas más importantes fue el Lanzón Monolítico, una gran figura de más de 4 metros que representa a un dios con cuerpo humano, cara de jaguar y cabello en forma de serpientes. Estaba escondido en el centro del templo, como si protegiera el lugar desde lo profundo. También está la Estela de Raimondi, que muestra a un dios con rasgos de felino, ave y serpiente. Sostiene dos bastones que parecen rayos, por eso lo llamaban el dios de los báculos. El Obelisco Tello representa a un caimán que tiene partes de macho y hembra, lo que simboliza la unión de los opuestos, algo muy importante para los Chavín. Y no olvidemos las Cabezas Clava, esculturas con caras feroces y ojos grandes que estaban colocadas en las paredes del templo. Se cree que servían para proteger el templo y asustar a los enemigos.',
                     models:['../assets/modelos/chavin/escultura/1_lanzon_monolitico.glb', 
@@ -326,6 +327,27 @@
     }
 
     /* ---------- precarga Sketchfab ---------- */
+    document.addEventListener('DOMContentLoaded',()=>{
+        const client=new Sketchfab(apiFrame);
+        client.init(CONTENT.ubicacion.embedUid,{
+            autostart:0,ui_controls:0,ui_watermark_link:0,
+            success(api){
+                skfbApi=api;
+                api.addEventListener('viewerready',()=>{
+                    skfbReady=true;
+                    loader.style.display='none';
+                    api.pause();
+                    // Por defecto, al precargar, Sketchfab está oculto y no interactuable
+                    apiFrame.classList.remove('active'); // Asegurarse de que no esté activo inicialmente
+                    arContentViewer.classList.add('hidden'); // Ocultar el contenedor de contenido AR
+                    arContentViewer.style.pointerEvents = 'none'; // Desactivar interacción
+                });
+                api.start();
+            },
+            error(){console.error('❌ Error precargando Sketchfab');}
+        });
+    });
+
     document.addEventListener('DOMContentLoaded',()=>{
         const client=new Sketchfab(apiFrame);
         client.init(CONTENT.ubicacion.embedUid,{
