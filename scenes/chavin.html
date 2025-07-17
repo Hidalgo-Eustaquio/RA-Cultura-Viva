@@ -27,7 +27,7 @@
                     text-align:center;line-height:50px;font-size:40px;}
         #hud-back{bottom:15px;left:50%;transform:translateX(-50%);
                     background:#4caf50;color:#fff;padding:12px 16px;font-size:18px;
-                    border:2px solid #fff;border-radius:12px;cursor:pointer;}
+                    border:2px solid #fff;border-radius:12px;cursor:pointer;text-align:center;}
         .hud-menu{top:60px;display:flex;gap:10px;justify-content:center;}
         .hud-menu button{background:#4caf50;color:#fff;padding:12px 16px;font-size:18px;
                             border:2px solid #fff;border-radius:12px;cursor:pointer;}
@@ -86,8 +86,7 @@
             top:118px;                      /* 118 px desde el borde superior */
             left:50%;
             transform:translateX(-50%); /* solo centrado horizontal */
-
-            border:none;
+            border:2px solid #fff;border-radius:12px;
             display:none;
             pointer-events:auto;          /* mantiene interacción */
         }
@@ -111,19 +110,19 @@
     <div id="hud-back" class="hud-ui" onclick="location.href='../index.html'">← IR AL MAPA</div>
 
     <div id="menu-front" class="hud-ui hud-menu">
-        <button data-key="ubicacion">1.Ubicación</button>
-        <button data-key="descubridor">2.Descubridor</button>
+        <button data-key="ubicacion">Ubicación</button>
+        <button data-key="descubridor">Descubridor</button>
         
-        <button data-key="economia">3.Economía</button>
+        <button data-key="economia">Economía</button>
     </div>
     <div id="menu-left"  class="hud-ui hud-menu hidden">
-        <button data-key="sociedad">4.Sociedad</button>
-        <button data-key="arquitectura">5.Arquitectura</button>
+        <button data-key="sociedad">Sociedad</button>
+        <button data-key="arquitectura">Arquitectura</button>
     </div>
     <div id="menu-right" class="hud-ui hud-menu hidden">
-        <button data-key="escultura">6.Escultura&nbsp;(3D)</button>
-        <button data-key="metalurgia">7.Metalurgia&nbsp;(3D)</button>
-        <button data-key="ceramica">8.Cerámica&nbsp;(3D)</button>
+        <button data-key="escultura">Escultura&nbsp;(3D)</button>
+        <button data-key="metalurgia">Metalurgia&nbsp;(3D)</button>
+        <button data-key="ceramica">Cerámica&nbsp;(3D)</button>
     </div>
 
     <div id="hud-panel" class="hud-ui hidden"></div>
@@ -165,18 +164,22 @@
         arquitectura:{audio:'../assets/audios/chavin_arquitectura.mp3',
                         text :'En la cultura Chavín, usaban adobe en la costa y piedra en la sierra para construir. Hacían pirámides truncas, templos en forma de herradura o de U, plazas circulares y cuadradas hundidas, y túneles subterráneos que representaban el mundo de abajo, llamado Uku Pacha. Los templos cumplían tres funciones: control social, astronómica y religiosa.',
                         embedUid:'a0fbb78a90704f77974ad03428a3d704'},
+        escultura:{audio:'../assets/audios/chavin_escultura.mp3',
+                    text :'En la cultura Chavín, sus esculturas eran de piedra y representaban dioses con formas poderosas y misteriosas. Usaban animales como el felino, el ave, la serpiente y el caimán, que eran símbolos de fuerza y respeto. Una de las esculturas más importantes fue el Lanzón Monolítico, una gran figura de más de 4 metros que representa a un dios con cuerpo humano, cara de jaguar y cabello en forma de serpientes. Estaba escondido en el centro del templo, como si protegiera el lugar desde lo profundo. También está la Estela de Raimondi, que muestra a un dios con rasgos de felino, ave y serpiente. Sostiene dos bastones que parecen rayos, por eso lo llamaban el dios de los báculos. El Obelisco Tello representa a un caimán que tiene partes de macho y hembra, lo que simboliza la unión de los opuestos, algo muy importante para los Chavín. Y no olvidemos las Cabezas Clava, esculturas con caras feroces y ojos grandes que estaban colocadas en las paredes del templo. Se cree que servían para proteger el templo y asustar a los enemigos.',
+                    models:['../assets/modelos/chavin/escultura/1_lanzon_monolitico.glb', 
+                            '../assets/modelos/chavin/escultura/2_estela_raimondi.glb',
+                            '../assets/modelos/chavin/escultura/3_obelisco_tello.glb',
+                            '../assets/modelos/chavin/escultura/4_cabeza_clava_rn_3347.glb',
+                            '../assets/modelos/chavin/escultura/5_cabeza_clava_rn_192986.glb',
+                            '../assets/modelos/chavin/escultura/6_cabeza_clava_rn_3349.glb']},
+        metalurgia:{audio:'../assets/audios/chavin_metalurgia.mp3',
+                    text :'En la cultura Chavín, también trabajaban los metales como el oro. Destacaron por hacer adornos y objetos muy finos. Uno de los más conocidos es el collar de Kunturhuasi, hecho con oro y piedras preciosas. También está el tesoro de Chongoyape, que incluye coronas y collares usados en ceremonias importantes.',
+                    models:['../assets/modelos/chavin/metalurgia/1_collar_kunturhuasi.glb', 
+                            '../assets/modelos/chavin/metalurgia/2_tesoro_kunturhuasi.glb']},
         ceramica:{audio:'../assets/audios/chavin_ceramica.mp3',
-                    text :'La cerámica era muy colorida…',
-                    models:['../assets/modelos/chavin/ceramica/objeto_01_nasca.glb',
-                            '../assets/modelos/chavin/ceramica/objeto_02_nasca.glb',
-                            '../assets/modelos/chavin/ceramica/objeto_03_nasca.glb']},
-        geoglifo:{audio:'../assets/audios/chavin_geoglifo.mp3',
-                    text :'En 1927, Toribio Mejía Xesspe descubrió…',
-                    video:'../assets/videos/chavin_video.mp4',
-                    models:['../assets/modelos/chavin/geoglifo/1_el_colibri_lineas_de_nazca.glb',
-                            '../assets/modelos/chavin/geoglifo/2_the_astronaut_geoglyph_in_nazca_peru.glb',
-                            '../assets/modelos/chavin/geoglifo/3_nazca_lines_tree_and_hands_peru.glb',
-                            '../assets/modelos/chavin/geoglifo/4_nazca_lines_spider_peru.glb']}
+                    text :'En la cultura Chavín, la cerámica era monocroma, es decir, de un solo color, normalmente negro o gris. Tenía forma redonda (globular), base plana y un asa especial llamada asa gollete estribo, con un solo pico. Usaban una técnica llamada incisión, donde dibujaban figuras como felinos sobre la arcilla antes de hornearla.',
+                    models:['../assets/modelos/chavin/ceramica/1_botella-204002-chavin.glb', 
+                            '../assets/modelos/chavin/ceramica/2_botella-203907-chavin.glb']}
     };
 
     /* ---------- refs & estado ---------- */
